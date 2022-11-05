@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <db.h>
+#define DB_STR_MAX 500
+#define DATABASE "RESOURCE.db"
 
 typedef enum {
 	o_CREATE = 1,

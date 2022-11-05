@@ -47,7 +47,10 @@ int Store_CSE(CSE *cse_object)
     char* program_name = "my_prog";
 
     // if input == NULL
-    if (cse_object->ri == NULL) cse_object->ri = "";
+    if (cse_object->ri == NULL) {
+        fprintf(stderr, "ri is NULL\n");
+        return 0;
+    }
     if (cse_object->rn == NULL) cse_object->rn = "";
     if (cse_object->pi == NULL) cse_object->pi = "NULL";
     if (cse_object->ty == '\0') cse_object->ty = -1;

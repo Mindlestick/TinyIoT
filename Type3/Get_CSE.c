@@ -5,22 +5,10 @@
 #include <db.h>
 #include "onem2m.h"
 
-ACP* Get_ACP(char* ri);
+CSE* Get_CSE(char* ri);
 int main() {
-    /*
-    double start, end;
-
-    //for 루프 시작 시간
-    start = (double)clock() / CLOCKS_PER_SEC; 
-    ACP *acp = Get_ACP("ri-14998");
-
-     //for 루프 끝난 시간
-    end = (((double)clock()) / CLOCKS_PER_SEC);
-    printf("프로그램 수행 시간 :%lf\n", (end-start));
-
-    */
-    ACP *acp = Get_ACP("1-20191210093452845");
-    printf("%s\n",acp->rn);
+    CSE *cse = Get_CSE("5-20191210093452845");
+    printf("%s\n",cse->rn);
 
     return 0;
 }
@@ -63,11 +51,11 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-ACP* Get_ACP(char* ri) {
-    //char* DATABASE = "ACP.db";
+CSE* Get_CSE(char* ri) {
+    //char* DATABASE = "CSE.db";
 
     //struct to return
-    ACP* new_acp = (ACP*)malloc(sizeof(ACP));
+    CSE* new_cse = (CSE*)malloc(sizeof(CSE));
 
     DB* dbp;
     DBC* dbcp;
@@ -91,71 +79,47 @@ ACP* Get_ACP(char* ri) {
         if (strncmp(key.data, ri, key.size) == 0) {
             flag=1;
             // ri = key
-            new_acp->ri = malloc(key.size);
-            strcpy(new_acp->ri, key.data);
+            new_cse->ri = malloc(key.size);
+            strcpy(new_cse->ri, key.data);
 
             char *ptr = strtok((char*)data.data, ",");  //split first string
             while (ptr != NULL) { // Split to end of next string
                 switch (idx) {
                 case 0:
-                    new_acp->rn = malloc(strlen(ptr));
-                    strcpy(new_acp->rn, ptr);
+                    new_cse->rn = malloc(strlen(ptr));
+                    strcpy(new_cse->rn, ptr);
 
                     idx++;
                     break;
                 case 1:
-                    new_acp->pi = malloc(strlen(ptr));
-                    strcpy(new_acp->pi, ptr);
+                    new_cse->pi = malloc(strlen(ptr));
+                    strcpy(new_cse->pi, ptr);
 
                     idx++;
                     break;
                 case 2:
-                    new_acp->ty = atoi(ptr);
+                    new_cse->ty = atoi(ptr);
 
                     idx++;
                     break;
                 case 3:
-                    new_acp->ct = malloc(strlen(ptr));
-                    strcpy(new_acp->ct, ptr);
+                    new_cse->ct = malloc(strlen(ptr));
+                    strcpy(new_cse->ct, ptr);
 
                     idx++;
                     break;
                 case 4:
-                    new_acp->lt = malloc(strlen(ptr));
-                    strcpy(new_acp->lt, ptr);
+                    new_cse->lt = malloc(strlen(ptr));
+                    strcpy(new_cse->lt, ptr);
 
                     idx++;
                     break;                
                 case 5:
-                    new_acp->et = malloc(strlen(ptr));
-                    strcpy(new_acp->et, ptr);
+                    new_cse->csi = malloc(strlen(ptr));
+                    strcpy(new_cse->csi, ptr);
 
                     idx++;
-                    break;
-                case 6:
-                    new_acp->pv_acor = malloc(strlen(ptr));
-                    strcpy(new_acp->pv_acor, ptr);
-
-                    idx++;
-                    break;
-                case 7:
-                    new_acp->pv_acop = malloc(strlen(ptr));
-                    strcpy(new_acp->pv_acop, ptr);
-
-                    idx++;
-                    break;
-                case 8:
-                    new_acp->pvs_acor = malloc(strlen(ptr));
-                    strcpy(new_acp->pvs_acor, ptr);
-
-                    idx++;
-                    break;
-                case 9:
-                    new_acp->pvs_acop = malloc(strlen(ptr));
-                    strcpy(new_acp->pvs_acop, ptr);
-
-                    idx++;
-                    break;                
+                    break;             
                 default:
                     idx=-1;
                 }
@@ -180,5 +144,5 @@ ACP* Get_ACP(char* ri) {
     if (dbp != NULL)
         dbp->close(dbp, 0);
 
-    return new_acp;
+    return new_cse;
 }

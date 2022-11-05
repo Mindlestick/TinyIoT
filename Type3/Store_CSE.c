@@ -5,25 +5,42 @@
 #include <db.h>
 #include <ctype.h>
 #include <time.h>
+
 #include "onem2m.h"
 
-/* Function to create test data */
-ACP* StructGenerator(){
-    ACP* acp = (ACP*) malloc(25000*sizeof(ACP));
-    for(int i=0;i<25000;i++){
-        acp[i].rn = (char*)malloc(8);
-        acp[i].ri = (char*)malloc(8);        
-        char num[5]="";
+int main() {
+    
+    CSE cse,cse2;
 
-        strcpy(acp[i].rn, "acp");
-        strcpy(acp[i].ri, "ri-");
+    //input sample
+    cse.rn = "cse1";
+    cse.ri = "5-20191210093452845";
+    cse.pi = "NULL";
+    cse.ty = 5;
+    cse.ct = "20191210T093452";
+    cse.lt = "20191210T093452";
+    cse.csi = "/Tiny Project1";
 
-        sprintf(num, "%d", i);
-        strcat(acp[i].rn,num);
-        strcat(acp[i].ri,num);
-    }
-    return acp;
+    cse2.rn = "cse4";
+    cse2.ri = "5-20191210093452845";
+    cse2.pi = "NULL";
+    cse2.ty = 5;
+    cse2.ct = "20191210T093452";
+    cse2.lt = "20191210T093452";
+    cse2.csi = "/Tiny Project2";
+
+
+    // [success -> 1] 
+    if(Store_CSE(&cse)) fprintf(stderr, "store success!\n");
+    if(Store_CSE(&cse2)) fprintf(stderr, "store success!\n");
+
+    // print
+    //char* DATABASE = "RESOURCE.db";
+    display(DATABASE);
+
+    return 0;
 }
+
 /*DB CREATE*/
 DB* DB_CREATE_(DB *dbp){
     int ret;
@@ -62,51 +79,8 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int main() {
-/*
-    double start, end;
-
-    //for 루프 시작 시간
-    start = (double)clock() / CLOCKS_PER_SEC; 
-
-    ACP* test = StructGenerator();
-    for(int i=0;i<25000;i++){
-        Store_ACP(&test[i]);
-    }
-
-    //for 루프 끝난 시간
-    end = (((double)clock()) / CLOCKS_PER_SEC);
-    printf("프로그램 수행 시간 :%lf\n", (end-start));
-
-*/
-    
-    ACP acp;
-
-    //input sample
-    acp.rn = "acp2";
-    acp.ri = "1-20191210093452845";
-    acp.pi = "pi_pi";
-    acp.ty = 1;
-    acp.ct = "20191210T093452";
-    acp.lt = "20191210T093452";
-    acp.et = "20211210T093452";
-    acp.pv_acor = "CAE1";
-    acp.pv_acop = "2";
-    acp.pvs_acor = "SM";
-    acp.pvs_acop = "63";
-
-    // [success -> 1] 
-    if(Store_ACP(&acp)) fprintf(stderr, "store success!\n");
-
-    // print
-    //char* DATABASE = "ACP.db";
-    display(DATABASE);
-
-    return 0;
-}
-
-int Store_ACP(ACP *acp_object) {
-    //char* DATABASE = "ACP.db";
+int Store_CSE(CSE *cse_object) {
+    //char* DATABASE = "CSE.db";
 
     DB* dbp;    // db handle
     DBC* dbcp;
@@ -117,42 +91,34 @@ int Store_ACP(ACP *acp_object) {
 
 
     // if input == NULL
-    if (acp_object->ri == NULL) {
+    if (cse_object->ri == NULL) {
         fprintf(stderr, "ri is NULL\n");
         return 0;
     }
-    if (acp_object->rn == NULL) acp_object->rn = "";
-    if (acp_object->pi == NULL) acp_object->pi = "NULL";
-    if (acp_object->ty == '\0') acp_object->ty = -1;
-    if (acp_object->ct == NULL) acp_object->ct = "";
-    if (acp_object->lt == NULL) acp_object->lt = "";
-    if (acp_object->et == NULL) acp_object->et = "";
-
-   if (acp_object->pv_acor == NULL) acp_object->pv_acor = "";       
-   if (acp_object->pv_acop == NULL) acp_object->pv_acop = ""; 
-   if (acp_object->pvs_acop == NULL) acp_object->pvs_acor = ""; 
-   if (acp_object->pvs_acop == NULL) acp_object->pvs_acop = ""; 
-  
+    if (cse_object->rn == NULL) cse_object->rn = "";
+    if (cse_object->pi == NULL) cse_object->pi = "NULL";
+    if (cse_object->ty == '\0') cse_object->ty = -1;
+    if (cse_object->ct == NULL) cse_object->ct = "";
+    if (cse_object->lt == NULL) cse_object->lt = "";
+    if (cse_object->csi == NULL) cse_object->csi = "";
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
-
-    /* keyand data must initialize */
+    
+    /* key and data must initialize */
     memset(&key_ri, 0, sizeof(DBT));
     memset(&data, 0, sizeof(DBT));
 
     /* initialize the data to be the first of two duplicate records. */
-    key_ri.data = acp_object->ri;
-    key_ri.size = strlen(acp_object->ri) + 1;
+    key_ri.data = cse_object->ri;
+    key_ri.size = strlen(cse_object->ri) + 1;
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    //strcat(str,acp_object->rn);
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%s,%s",
-            acp_object->rn,acp_object->pi,acp_object->ty,acp_object->ct,acp_object->lt,
-            acp_object->et,acp_object->pv_acor,acp_object->pv_acop,acp_object->pvs_acor,acp_object->pvs_acop);
-            
+    sprintf(str, "%s,%s,%d,%s,%s,%s",
+            cse_object->rn,cse_object->pi,cse_object->ty,cse_object->ct,cse_object->lt,cse_object->csi);
+
     data.data = str;
     data.size = strlen(str) + 1;
 
