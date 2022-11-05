@@ -116,7 +116,6 @@ int display(char* database)
         exit(0);
     }
 
-
 err:    if (close_dbc && (ret = dbcp->close(dbcp)) != 0)
 dbp->err(dbp, ret, "DBcursor->close");
 if (close_db && (ret = dbp->close(dbp, 0)) != 0)
@@ -178,6 +177,128 @@ int Store_CSE(CSE *cse_object) {
 
     return 1;
 }
+
+int Store_AE(AE *ae_object) {
+    //char* DATABASE = "AE.db";
+
+    DB* dbp;    // db handle
+    DBC* dbcp;
+    int ret;        // template value
+
+    DBT key_ri;
+    DBT data;  // storving key and real data
+    char rr[6] ="";
+
+    // if input == NULL
+    if (ae_object->ri == NULL) {
+        fprintf(stderr, "ri is NULL\n");
+        return 0;
+    }
+    if (ae_object->rn == NULL) ae_object->rn = "";
+    if (ae_object->pi == NULL) ae_object->pi = "NULL";
+    if (ae_object->ty == '\0') ae_object->ty = -1;
+    if (ae_object->ct == NULL) ae_object->ct = "";
+    if (ae_object->lt == NULL) ae_object->lt = "";
+    if (ae_object->et == NULL) ae_object->et = "";
+
+    if (ae_object->rr == '\0') ae_object->rr = true;
+    else if(ae_object->rr == true) strcpy(rr,"true");
+    else strcpy(rr,"false");
+
+    if (ae_object->api == NULL) ae_object->api = "";
+    if (ae_object->aei == NULL) ae_object->aei = "";
+
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+    
+    /* key and data must initialize */
+    memset(&key_ri, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    /* initialize the data to be the first of two duplicate records. */
+    key_ri.data = ae_object->ri;
+    key_ri.size = strlen(ae_object->ri) + 1;
+
+    /* List data excluding 'ri' as strings using delimiters. */
+    char str[DB_STR_MAX]= "\0";
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%s",
+            ae_object->rn,ae_object->pi,ae_object->ty,ae_object->ct,ae_object->lt,ae_object->et,
+            ae_object->api,rr,ae_object->aei);
+
+    data.data = str;
+    data.size = strlen(str) + 1;
+
+    /* input DB */
+    if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
+        dbp->err(dbp, ret, "db->cursor");
+
+    /* DB close */
+    dbcp->close(dbcp);
+    dbp->close(dbp, 0); 
+
+    return 1;
+}
+
+int Store_CNT(CNT *cnt_object) {
+    //char* DATABASE = "CNT.db";
+
+    DB* dbp;    // db handle
+    DBC* dbcp;
+    int ret;        // template value
+
+    DBT key_ri;
+    DBT data;  // storving key and real data
+    
+    // if input == NULL
+    if (cnt_object->ri == NULL) {
+        fprintf(stderr, "ri is NULL\n");
+        return 0;
+    }
+    if (cnt_object->rn == NULL) cnt_object->rn = "";
+    if (cnt_object->pi == NULL) cnt_object->pi = "NULL";
+    if (cnt_object->ty == '\0') cnt_object->ty = 0;
+    if (cnt_object->ct == NULL) cnt_object->ct = "";
+    if (cnt_object->lt == NULL) cnt_object->lt = "";
+    if (cnt_object->et == NULL) cnt_object->et = "";
+
+    if (cnt_object->cni == '\0') cnt_object->cni = 0;
+    if (cnt_object->cbs == '\0') cnt_object->cbs = 0;
+    if (cnt_object->st == '\0') cnt_object->st = 0;
+
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+    
+    /* key and data must initialize */
+    memset(&key_ri, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    /* initialize the data to be the first of two duplicate records. */
+    key_ri.data = cnt_object->ri;
+    key_ri.size = strlen(cnt_object->ri) + 1;
+
+    /* List data excluding 'ri' as strings using delimiters. */
+    char str[DB_STR_MAX]= "\0";
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%d,%d,%d",
+            cnt_object->rn,cnt_object->pi,cnt_object->ty,cnt_object->ct,cnt_object->lt,cnt_object->et,
+            cnt_object->cbs,cnt_object->cni,cnt_object->st);
+
+    data.data = str;
+    data.size = strlen(str) + 1;
+
+    /* input DB */
+    if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
+        dbp->err(dbp, ret, "db->cursor");
+
+    /* DB close */
+    dbcp->close(dbcp);
+    dbp->close(dbp, 0); 
+
+    return 1;
+}
+
+
 
 CSE* Get_CSE(char* ri) {
     //char* DATABASE = "CSE.db";
@@ -273,4 +394,120 @@ CSE* Get_CSE(char* ri) {
         dbp->close(dbp, 0);
 
     return new_cse;
+}
+
+AE* Get_AE(char* ri) {
+    //char* DATABASE = "AE.db";
+
+    //struct to return
+    AE* new_ae = (AE*)malloc(sizeof(AE));
+
+    DB* dbp;
+    DBC* dbcp;
+    DBT key, data;
+    int ret;
+
+    int cnt = 0;
+    int flag = 0;
+    int idx = 0;
+    
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+
+    /* Initialize the key/data return pair. */
+    memset(&key, 0, sizeof(key));
+    memset(&data, 0, sizeof(data));
+
+    while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
+        cnt++;
+        if (strncmp(key.data, ri, key.size) == 0) {
+            flag=1;
+            // ri = key
+            new_ae->ri = malloc(key.size);
+            strcpy(new_ae->ri, key.data);
+
+            char *ptr = strtok((char*)data.data, ",");  //split first string
+            while (ptr != NULL) { // Split to end of next string
+                switch (idx) {
+                case 0:
+                    new_ae->rn = malloc(strlen(ptr));
+                    strcpy(new_ae->rn, ptr);
+
+                    idx++;
+                    break;
+                case 1:
+                    new_ae->pi = malloc(strlen(ptr));
+                    strcpy(new_ae->pi, ptr);
+
+                    idx++;
+                    break;
+                case 2:
+                    new_ae->ty = atoi(ptr);
+
+                    idx++;
+                    break;
+                case 3:
+                    new_ae->ct = malloc(strlen(ptr));
+                    strcpy(new_ae->ct, ptr);
+
+                    idx++;
+                    break;
+                case 4:
+                    new_ae->lt = malloc(strlen(ptr));
+                    strcpy(new_ae->lt, ptr);
+
+                    idx++;
+                    break;                
+                case 5:
+                    new_ae->et = malloc(strlen(ptr));
+                    strcpy(new_ae->et, ptr);
+
+                    idx++;
+                    break;      
+                case 6:
+                    new_ae->api = malloc(strlen(ptr));
+                    strcpy(new_ae->api, ptr);
+
+                    idx++;
+                    break;      
+                case 7:
+                    if(strcmp(ptr,"true")==0)
+                        new_ae->rr = true;
+                    else
+                        new_ae->rr = false;
+
+                    idx++;
+                    break;      
+                case 8:
+                    new_ae->aei = malloc(strlen(ptr));
+                    strcpy(new_ae->aei, ptr);
+
+                    idx++;
+                    break;                                                                     
+                default:
+                    idx=-1;
+                }
+                
+                ptr = strtok(NULL, ","); //The delimiter is ,
+            }
+        }
+    }
+    if (ret != DB_NOTFOUND) {
+        dbp->err(dbp, ret, "DBcursor->get");
+        fprintf(stderr, "Cursor ERROR\n");
+        exit(0);
+    }
+    if (cnt == 0 || flag==0) {
+        fprintf(stderr, "Data not exist\n");
+        return NULL;
+    }
+
+    /* Cursors must be closed */
+    if (dbcp != NULL)
+        dbcp->close(dbcp);
+    if (dbp != NULL)
+        dbp->close(dbp, 0);
+
+    return new_ae;
 }

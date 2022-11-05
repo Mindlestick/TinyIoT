@@ -10,34 +10,34 @@
 
 int main() {
     
-    AE ae1,ae2;
+    CNT cnt1,cnt2;
 
     //input sample
-    ae1.rn = "Sensor1";
-    ae1.ty = 2;
-    ae1.pi = "5-20191210093452845";
-    ae1.ri = "TAE1";
-    ae1.ct = "20220513T083900";
-    ae1.lt = "20220513T083900";
-    ae1.et = "20240513T083900";
-    ae1.api = "tinyProject1";
-    ae1.rr = true;
-    ae1.aei = "TAE1";
+    cnt1.pi = "TAE1";
+    cnt1.ri = "3-20220513093154147745";
+    cnt1.ty = 3;
+    cnt1.ct = "202205T093154";
+    cnt1.st = 0;
+    cnt1.rn = "status1";
+    cnt1.lt = "20220513T093154";
+    cnt1.et = "20220513T093154";
+    cnt1.cni = 0;
+    cnt1.cbs = 0;
 
-    ae2.rn = "Sensor2";
-    ae2.ty = 2;
-    ae2.pi = "5-20191210093452845";
-    ae2.ri = "TAE2";
-    ae2.ct = "20220513T083900";
-    ae2.lt = "20220513T083900";
-    ae2.et = "20240513T083900";
-    ae2.api = "tinyProject2";
-    ae2.rr = true;
-    ae2.aei = "TAE2";
+    cnt2.pi = "TAE1";
+    cnt2.ri = "3-20210513093154147745";
+    cnt2.ty = 3;
+    cnt2.ct = "202105T093154";
+    cnt2.st = 0;
+    cnt2.rn = "status2";
+    cnt2.lt = "20210513T093154";
+    cnt2.et = "20210513T093154";
+    cnt2.cni = 0;
+    cnt2.cbs = 0;
 
     // [success -> 1] 
-    if(Store_AE(&ae1)) fprintf(stderr, "store success!\n");
-    if(Store_AE(&ae2)) fprintf(stderr, "store success!\n");
+    if(Store_CNT(&cnt1)) fprintf(stderr, "store success!\n");
+    if(Store_CNT(&cnt2)) fprintf(stderr, "store success!\n");
 
     //char* DATABASE = "RESOURCE.db";
     display(DATABASE);
@@ -83,8 +83,8 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int Store_AE(AE *ae_object) {
-    //char* DATABASE = "AE.db";
+int Store_CNT(CNT *cnt_object) {
+    //char* DATABASE = "CNT.db";
 
     DB* dbp;    // db handle
     DBC* dbcp;
@@ -92,26 +92,22 @@ int Store_AE(AE *ae_object) {
 
     DBT key_ri;
     DBT data;  // storving key and real data
-    char rr[6] ="";
-
+    
     // if input == NULL
-    if (ae_object->ri == NULL) {
+    if (cnt_object->ri == NULL) {
         fprintf(stderr, "ri is NULL\n");
         return 0;
     }
-    if (ae_object->rn == NULL) ae_object->rn = "";
-    if (ae_object->pi == NULL) ae_object->pi = "NULL";
-    if (ae_object->ty == '\0') ae_object->ty = 0;
-    if (ae_object->ct == NULL) ae_object->ct = "";
-    if (ae_object->lt == NULL) ae_object->lt = "";
-    if (ae_object->et == NULL) ae_object->et = "";
+    if (cnt_object->rn == NULL) cnt_object->rn = "";
+    if (cnt_object->pi == NULL) cnt_object->pi = "NULL";
+    if (cnt_object->ty == '\0') cnt_object->ty = 0;
+    if (cnt_object->ct == NULL) cnt_object->ct = "";
+    if (cnt_object->lt == NULL) cnt_object->lt = "";
+    if (cnt_object->et == NULL) cnt_object->et = "";
 
-    if (ae_object->rr == '\0') ae_object->rr = true;
-    else if(ae_object->rr == true) strcpy(rr,"true");
-    else strcpy(rr,"false");
-
-    if (ae_object->api == NULL) ae_object->api = "";
-    if (ae_object->aei == NULL) ae_object->aei = "";
+    if (cnt_object->cni == '\0') cnt_object->cni = 0;
+    if (cnt_object->cbs == '\0') cnt_object->cbs = 0;
+    if (cnt_object->st == '\0') cnt_object->st = 0;
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp);
@@ -122,14 +118,14 @@ int Store_AE(AE *ae_object) {
     memset(&data, 0, sizeof(DBT));
 
     /* initialize the data to be the first of two duplicate records. */
-    key_ri.data = ae_object->ri;
-    key_ri.size = strlen(ae_object->ri) + 1;
+    key_ri.data = cnt_object->ri;
+    key_ri.size = strlen(cnt_object->ri) + 1;
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%s",
-            ae_object->rn,ae_object->pi,ae_object->ty,ae_object->ct,ae_object->lt,
-            ae_object->et,ae_object->api,rr,ae_object->aei);
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%d,%d,%d",
+            cnt_object->rn,cnt_object->pi,cnt_object->ty,cnt_object->ct,cnt_object->lt,cnt_object->et,
+            cnt_object->cbs,cnt_object->cni,cnt_object->st);
 
     data.data = str;
     data.size = strlen(str) + 1;
