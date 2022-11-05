@@ -1,2 +1,2 @@
 # TinyIoT
-BerkelelyDB_Type3
+BerkelelyDB_Type별 분리
