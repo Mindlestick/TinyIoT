@@ -95,12 +95,12 @@ int Store_CSE(CSE *cse_object) {
         fprintf(stderr, "ri is NULL\n");
         return 0;
     }
-    if (cse_object->rn == NULL) cse_object->rn = "";
+    if (cse_object->rn == NULL) cse_object->rn = " ";
     if (cse_object->pi == NULL) cse_object->pi = "NULL";
     if (cse_object->ty == '\0') cse_object->ty = 0;
-    if (cse_object->ct == NULL) cse_object->ct = "";
-    if (cse_object->lt == NULL) cse_object->lt = "";
-    if (cse_object->csi == NULL) cse_object->csi = "";
+    if (cse_object->ct == NULL) cse_object->ct = " ";
+    if (cse_object->lt == NULL) cse_object->lt = " ";
+    if (cse_object->csi == NULL) cse_object->csi = " ";
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp);

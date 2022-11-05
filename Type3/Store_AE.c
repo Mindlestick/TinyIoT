@@ -99,19 +99,19 @@ int Store_AE(AE *ae_object) {
         fprintf(stderr, "ri is NULL\n");
         return 0;
     }
-    if (ae_object->rn == NULL) ae_object->rn = "";
+    if (ae_object->rn == NULL) ae_object->rn = " ";
     if (ae_object->pi == NULL) ae_object->pi = "NULL";
     if (ae_object->ty == '\0') ae_object->ty = 0;
-    if (ae_object->ct == NULL) ae_object->ct = "";
-    if (ae_object->lt == NULL) ae_object->lt = "";
-    if (ae_object->et == NULL) ae_object->et = "";
+    if (ae_object->ct == NULL) ae_object->ct = " ";
+    if (ae_object->lt == NULL) ae_object->lt = " ";
+    if (ae_object->et == NULL) ae_object->et = " ";
 
     if (ae_object->rr == '\0') ae_object->rr = true;
     else if(ae_object->rr == true) strcpy(rr,"true");
     else strcpy(rr,"false");
 
-    if (ae_object->api == NULL) ae_object->api = "";
-    if (ae_object->aei == NULL) ae_object->aei = "";
+    if (ae_object->api == NULL) ae_object->api = " ";
+    if (ae_object->aei == NULL) ae_object->aei = " ";
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp);

@@ -5,25 +5,48 @@
 #include <db.h>
 #include <ctype.h>
 #include <time.h>
+
 #include "onem2m.h"
 
-/* Function to create test data */
-ACP* StructGenerator(){
-    ACP* acp = (ACP*) malloc(25000*sizeof(ACP));
-    for(int i=0;i<25000;i++){
-        acp[i].rn = (char*)malloc(8);
-        acp[i].ri = (char*)malloc(8);        
-        char num[5]="";
+int main() {
+    
+    CIN cin1,cin2;
 
-        strcpy(acp[i].rn, "acp");
-        strcpy(acp[i].ri, "ri-");
+    //input example
+    cin1.pi = "3-20220513091700249586";
+    cin1.ri = "4-20220513T093154";
+    cin1.ty = 4;
+    cin1.ct = "20220513T093154";
+    cin1.st = 1;
+    cin1.rn = "4-20220513T093154";
+    cin1.lt = "20220513T093154";
+    cin1.et = "20220513T093154";
+    cin1.cs = 2;
+    cin1.con = "ON";
+    cin1.csi = "test";
 
-        sprintf(num, "%d", i);
-        strcat(acp[i].rn,num);
-        strcat(acp[i].ri,num);
-    }
-    return acp;
+    cin2.pi = "3-20210513091700249586";
+    cin2.ri = "4-20220808T113154";
+    cin2.ty = 4;
+    cin2.ct = "20220808T113154";
+    cin2.st = 1;
+    cin2.rn = "4-20220808T113154";
+    cin2.lt = "20220808T113154";
+    cin2.et = "20220808T113154";
+    cin2.cs = 2;
+    cin2.con = "OFF";
+    cin2.csi = "test2";
+
+    // [success -> 1] 
+    if(Store_CIN(&cin1)) fprintf(stderr, "store success!\n");
+    if(Store_CIN(&cin2)) fprintf(stderr, "store success!\n");
+
+    //char* DATABASE = "RESOURCE.db";
+    display(DATABASE);
+
+    return 0;
 }
+
 /*DB CREATE*/
 DB* DB_CREATE_(DB *dbp){
     int ret;
@@ -62,51 +85,8 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int main() {
-/*
-    double start, end;
-
-    //for 루프 시작 시간
-    start = (double)clock() / CLOCKS_PER_SEC; 
-
-    ACP* test = StructGenerator();
-    for(int i=0;i<25000;i++){
-        Store_ACP(&test[i]);
-    }
-
-    //for 루프 끝난 시간
-    end = (((double)clock()) / CLOCKS_PER_SEC);
-    printf("프로그램 수행 시간 :%lf\n", (end-start));
-
-*/
-    
-    ACP acp;
-
-    //input sample
-    acp.rn = "acp2";
-    acp.ri = "1-20191210093452845";
-    acp.pi = "pi_pi";
-    acp.ty = 1;
-    acp.ct = "20191210T093452";
-    acp.lt = "20191210T093452";
-    acp.et = "20211210T093452";
-    acp.pv_acor = "CAE1";
-    acp.pv_acop = "2";
-    acp.pvs_acor = "SM";
-    acp.pvs_acop = "63";
-
-    // [success -> 1] 
-    if(Store_ACP(&acp)) fprintf(stderr, "store success!\n");
-
-    // print
-    //char* DATABASE = "ACP.db";
-    display(DATABASE);
-
-    return 0;
-}
-
-int Store_ACP(ACP *acp_object) {
-    //char* DATABASE = "ACP.db";
+int Store_CIN(CIN *cin_object) {
+    //char* DATABASE = "CIN.db";
 
     DB* dbp;    // db handle
     DBC* dbcp;
@@ -114,45 +94,42 @@ int Store_ACP(ACP *acp_object) {
 
     DBT key_ri;
     DBT data;  // storving key and real data
-
-
+    
     // if input == NULL
-    if (acp_object->ri == NULL) {
+    if (cin_object->ri == NULL) {
         fprintf(stderr, "ri is NULL\n");
         return 0;
     }
-    if (acp_object->rn == NULL) acp_object->rn = " ";
-    if (acp_object->pi == NULL) acp_object->pi = "NULL";
-    if (acp_object->ty == '\0') acp_object->ty = 0;
-    if (acp_object->ct == NULL) acp_object->ct = " ";
-    if (acp_object->lt == NULL) acp_object->lt = " ";
-    if (acp_object->et == NULL) acp_object->et = " ";
+    if (cin_object->rn == NULL) cin_object->rn = " ";
+    if (cin_object->pi == NULL) cin_object->pi = "NULL";
+    if (cin_object->ty == '\0') cin_object->ty = 0;
+    if (cin_object->ct == NULL) cin_object->ct = " ";
+    if (cin_object->lt == NULL) cin_object->lt = " ";
+    if (cin_object->et == NULL) cin_object->et = " ";
 
-   if (acp_object->pv_acor == NULL) acp_object->pv_acor = " ";       
-   if (acp_object->pv_acop == NULL) acp_object->pv_acop = " "; 
-   if (acp_object->pvs_acop == NULL) acp_object->pvs_acor = " "; 
-   if (acp_object->pvs_acop == NULL) acp_object->pvs_acop = " "; 
-  
+    if (cin_object->con == NULL) cin_object->con = " ";
+    if (cin_object->csi == NULL) cin_object->csi = " ";
+    if (cin_object->cs == '\0') cin_object->cs = 0;
+    if (cin_object->st == '\0') cin_object->st = 0;
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
-
-    /* keyand data must initialize */
+    
+    /* key and data must initialize */
     memset(&key_ri, 0, sizeof(DBT));
     memset(&data, 0, sizeof(DBT));
 
     /* initialize the data to be the first of two duplicate records. */
-    key_ri.data = acp_object->ri;
-    key_ri.size = strlen(acp_object->ri) + 1;
+    key_ri.data = cin_object->ri;
+    key_ri.size = strlen(cin_object->ri) + 1;
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    //strcat(str,acp_object->rn);
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%s,%s",
-            acp_object->rn,acp_object->pi,acp_object->ty,acp_object->ct,acp_object->lt,
-            acp_object->et,acp_object->pv_acor,acp_object->pv_acop,acp_object->pvs_acor,acp_object->pvs_acop);
-            
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%d,%d",
+            cin_object->rn,cin_object->pi,cin_object->ty,cin_object->ct,cin_object->lt,cin_object->et,
+            cin_object->con,cin_object->csi,cin_object->cs,cin_object->st);
+
     data.data = str;
     data.size = strlen(str) + 1;
 

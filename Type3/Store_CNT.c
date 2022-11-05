@@ -98,12 +98,12 @@ int Store_CNT(CNT *cnt_object) {
         fprintf(stderr, "ri is NULL\n");
         return 0;
     }
-    if (cnt_object->rn == NULL) cnt_object->rn = "";
+    if (cnt_object->rn == NULL) cnt_object->rn = " ";
     if (cnt_object->pi == NULL) cnt_object->pi = "NULL";
     if (cnt_object->ty == '\0') cnt_object->ty = 0;
-    if (cnt_object->ct == NULL) cnt_object->ct = "";
-    if (cnt_object->lt == NULL) cnt_object->lt = "";
-    if (cnt_object->et == NULL) cnt_object->et = "";
+    if (cnt_object->ct == NULL) cnt_object->ct = " ";
+    if (cnt_object->lt == NULL) cnt_object->lt = " ";
+    if (cnt_object->et == NULL) cnt_object->et = " ";
 
     if (cnt_object->cni == '\0') cnt_object->cni = 0;
     if (cnt_object->cbs == '\0') cnt_object->cbs = 0;
