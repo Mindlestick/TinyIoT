@@ -124,6 +124,7 @@ fprintf(stderr,
 return (0);
 }
 
+
 int Store_CSE(CSE *cse_object) {
     //char* DATABASE = "CSE.db";
 
@@ -140,12 +141,12 @@ int Store_CSE(CSE *cse_object) {
         fprintf(stderr, "ri is NULL\n");
         return 0;
     }
-    if (cse_object->rn == NULL) cse_object->rn = "";
+    if (cse_object->rn == NULL) cse_object->rn = " ";
     if (cse_object->pi == NULL) cse_object->pi = "NULL";
-    if (cse_object->ty == '\0') cse_object->ty = -1;
-    if (cse_object->ct == NULL) cse_object->ct = "";
-    if (cse_object->lt == NULL) cse_object->lt = "";
-    if (cse_object->csi == NULL) cse_object->csi = "";
+    if (cse_object->ty == '\0') cse_object->ty = 0;
+    if (cse_object->ct == NULL) cse_object->ct = " ";
+    if (cse_object->lt == NULL) cse_object->lt = " ";
+    if (cse_object->csi == NULL) cse_object->csi = " ";
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp);
@@ -194,19 +195,19 @@ int Store_AE(AE *ae_object) {
         fprintf(stderr, "ri is NULL\n");
         return 0;
     }
-    if (ae_object->rn == NULL) ae_object->rn = "";
+    if (ae_object->rn == NULL) ae_object->rn = " ";
     if (ae_object->pi == NULL) ae_object->pi = "NULL";
-    if (ae_object->ty == '\0') ae_object->ty = -1;
-    if (ae_object->ct == NULL) ae_object->ct = "";
-    if (ae_object->lt == NULL) ae_object->lt = "";
-    if (ae_object->et == NULL) ae_object->et = "";
+    if (ae_object->ty == '\0') ae_object->ty = 0;
+    if (ae_object->ct == NULL) ae_object->ct = " ";
+    if (ae_object->lt == NULL) ae_object->lt = " ";
+    if (ae_object->et == NULL) ae_object->et = " ";
 
     if (ae_object->rr == '\0') ae_object->rr = true;
     else if(ae_object->rr == true) strcpy(rr,"true");
     else strcpy(rr,"false");
 
-    if (ae_object->api == NULL) ae_object->api = "";
-    if (ae_object->aei == NULL) ae_object->aei = "";
+    if (ae_object->api == NULL) ae_object->api = " ";
+    if (ae_object->aei == NULL) ae_object->aei = " ";
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp);
@@ -223,8 +224,8 @@ int Store_AE(AE *ae_object) {
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
     sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%s",
-            ae_object->rn,ae_object->pi,ae_object->ty,ae_object->ct,ae_object->lt,ae_object->et,
-            ae_object->api,rr,ae_object->aei);
+            ae_object->rn,ae_object->pi,ae_object->ty,ae_object->ct,ae_object->lt,
+            ae_object->et,ae_object->api,rr,ae_object->aei);
 
     data.data = str;
     data.size = strlen(str) + 1;
@@ -255,12 +256,12 @@ int Store_CNT(CNT *cnt_object) {
         fprintf(stderr, "ri is NULL\n");
         return 0;
     }
-    if (cnt_object->rn == NULL) cnt_object->rn = "";
+    if (cnt_object->rn == NULL) cnt_object->rn = " ";
     if (cnt_object->pi == NULL) cnt_object->pi = "NULL";
     if (cnt_object->ty == '\0') cnt_object->ty = 0;
-    if (cnt_object->ct == NULL) cnt_object->ct = "";
-    if (cnt_object->lt == NULL) cnt_object->lt = "";
-    if (cnt_object->et == NULL) cnt_object->et = "";
+    if (cnt_object->ct == NULL) cnt_object->ct = " ";
+    if (cnt_object->lt == NULL) cnt_object->lt = " ";
+    if (cnt_object->et == NULL) cnt_object->et = " ";
 
     if (cnt_object->cni == '\0') cnt_object->cni = 0;
     if (cnt_object->cbs == '\0') cnt_object->cbs = 0;
@@ -298,6 +299,64 @@ int Store_CNT(CNT *cnt_object) {
     return 1;
 }
 
+int Store_CIN(CIN *cin_object) {
+    //char* DATABASE = "CIN.db";
+
+    DB* dbp;    // db handle
+    DBC* dbcp;
+    int ret;        // template value
+
+    DBT key_ri;
+    DBT data;  // storving key and real data
+    
+    // if input == NULL
+    if (cin_object->ri == NULL) {
+        fprintf(stderr, "ri is NULL\n");
+        return 0;
+    }
+    if (cin_object->rn == NULL) cin_object->rn = " ";
+    if (cin_object->pi == NULL) cin_object->pi = "NULL";
+    if (cin_object->ty == '\0') cin_object->ty = 0;
+    if (cin_object->ct == NULL) cin_object->ct = " ";
+    if (cin_object->lt == NULL) cin_object->lt = " ";
+    if (cin_object->et == NULL) cin_object->et = " ";
+
+    if (cin_object->con == NULL) cin_object->con = " ";
+    if (cin_object->csi == NULL) cin_object->csi = " ";
+    if (cin_object->cs == '\0') cin_object->cs = 0;
+    if (cin_object->st == '\0') cin_object->st = 0;
+
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+    
+    /* key and data must initialize */
+    memset(&key_ri, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    /* initialize the data to be the first of two duplicate records. */
+    key_ri.data = cin_object->ri;
+    key_ri.size = strlen(cin_object->ri) + 1;
+
+    /* List data excluding 'ri' as strings using delimiters. */
+    char str[DB_STR_MAX]= "\0";
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%d,%d",
+            cin_object->rn,cin_object->pi,cin_object->ty,cin_object->ct,cin_object->lt,cin_object->et,
+            cin_object->con,cin_object->csi,cin_object->cs,cin_object->st);
+
+    data.data = str;
+    data.size = strlen(str) + 1;
+
+    /* input DB */
+    if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
+        dbp->err(dbp, ret, "db->cursor");
+
+    /* DB close */
+    dbcp->close(dbcp);
+    dbp->close(dbp, 0); 
+
+    return 1;
+}
 
 
 CSE* Get_CSE(char* ri) {
@@ -510,4 +569,235 @@ AE* Get_AE(char* ri) {
         dbp->close(dbp, 0);
 
     return new_ae;
+}
+
+
+CNT* Get_CNT(char* ri) {
+    //char* DATABASE = "CNT.db";
+
+    //struct to return
+    CNT* new_cnt = (CNT*)malloc(sizeof(CNT));
+
+    DB* dbp;
+    DBC* dbcp;
+    DBT key, data;
+    int ret;
+
+    int cnt = 0;
+    int flag = 0;
+    int idx = 0;
+    
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+
+    /* Initialize the key/data return pair. */
+    memset(&key, 0, sizeof(key));
+    memset(&data, 0, sizeof(data));
+
+    while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
+        cnt++;
+        if (strncmp(key.data, ri, key.size) == 0) {
+            flag=1;
+            // ri = key
+            new_cnt->ri = malloc(key.size);
+            strcpy(new_cnt->ri, key.data);
+
+            char *ptr = strtok((char*)data.data, ",");  //split first string
+            while (ptr != NULL) { // Split to end of next string
+                switch (idx) {
+                case 0:
+                    new_cnt->rn = malloc(strlen(ptr));
+                    strcpy(new_cnt->rn, ptr);
+
+                    idx++;
+                    break;
+                case 1:
+                    new_cnt->pi = malloc(strlen(ptr));
+                    strcpy(new_cnt->pi, ptr);
+
+                    idx++;
+                    break;
+                case 2:
+                    new_cnt->ty = atoi(ptr);
+
+                    idx++;
+                    break;
+                case 3:
+                    new_cnt->ct = malloc(strlen(ptr));
+                    strcpy(new_cnt->ct, ptr);
+
+                    idx++;
+                    break;
+                case 4:
+                    new_cnt->lt = malloc(strlen(ptr));
+                    strcpy(new_cnt->lt, ptr);
+
+                    idx++;
+                    break;                
+                case 5:
+                    new_cnt->et = malloc(strlen(ptr));
+                    strcpy(new_cnt->et, ptr);
+
+                    idx++;
+                    break;      
+                case 6:
+                    new_cnt->cbs = atoi(ptr);
+
+                    idx++;
+                    break;     
+                case 7:
+                    new_cnt->cni = atoi(ptr);
+
+                    idx++;
+                    break;    
+                case 8:
+                    new_cnt->st = atoi(ptr);
+
+                    idx++;
+                    break;                                                                    
+                default:
+                    idx=-1;
+                }
+                
+                ptr = strtok(NULL, ","); //The delimiter is ,
+            }
+        }
+    }
+    if (ret != DB_NOTFOUND) {
+        dbp->err(dbp, ret, "DBcursor->get");
+        fprintf(stderr, "Cursor ERROR\n");
+        exit(0);
+    }
+    if (cnt == 0 || flag==0) {
+        fprintf(stderr, "Data not exist\n");
+        return NULL;
+    }
+
+    /* Cursors must be closed */
+    if (dbcp != NULL)
+        dbcp->close(dbcp);
+    if (dbp != NULL)
+        dbp->close(dbp, 0);
+
+    return new_cnt;
+}
+
+
+CIN* Get_CIN(char* ri) {
+    //char* DATABASE = "CIN.db";
+
+    //struct to return
+    CIN* new_cin = (CIN*)malloc(sizeof(CIN));
+
+    DB* dbp;
+    DBC* dbcp;
+    DBT key, data;
+    int ret;
+
+    int cin = 0;
+    int flag = 0;
+    int idx = 0;
+    
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+
+    /* Initialize the key/data return pair. */
+    memset(&key, 0, sizeof(key));
+    memset(&data, 0, sizeof(data));
+
+    while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
+        cin++;
+        if (strncmp(key.data, ri, key.size) == 0) {
+            flag=1;
+            // ri = key
+            new_cin->ri = malloc(key.size);
+            strcpy(new_cin->ri, key.data);
+
+            char *ptr = strtok((char*)data.data, ",");  //split first string
+            while (ptr != NULL) { // Split to end of next string
+                switch (idx) {
+                case 0:
+                    new_cin->rn = malloc(strlen(ptr));
+                    strcpy(new_cin->rn, ptr);
+
+                    idx++;
+                    break;
+                case 1:
+                    new_cin->pi = malloc(strlen(ptr));
+                    strcpy(new_cin->pi, ptr);
+
+                    idx++;
+                    break;
+                case 2:
+                    new_cin->ty = atoi(ptr);
+
+                    idx++;
+                    break;
+                case 3:
+                    new_cin->ct = malloc(strlen(ptr));
+                    strcpy(new_cin->ct, ptr);
+
+                    idx++;
+                    break;
+                case 4:
+                    new_cin->lt = malloc(strlen(ptr));
+                    strcpy(new_cin->lt, ptr);
+
+                    idx++;
+                    break;                
+                case 5:
+                    new_cin->et = malloc(strlen(ptr));
+                    strcpy(new_cin->et, ptr);
+
+                    idx++;
+                    break;      
+                case 6:
+                    new_cin->con = malloc(strlen(ptr));
+                    strcpy(new_cin->con, ptr);
+
+                    idx++;
+                    break;       
+                case 7:
+                    new_cin->csi = malloc(strlen(ptr));
+                    strcpy(new_cin->csi, ptr);
+
+                    idx++;
+                    break;   
+                case 8:
+                    new_cin->cs = atoi(ptr);
+
+                    idx++;
+                    break;            
+                case 9:
+                    new_cin->st = atoi(ptr);
+
+                    idx++;
+                    break;                                                                              
+                default:
+                    idx=-1;
+                }
+                
+                ptr = strtok(NULL, ","); //The delimiter is ,
+            }
+        }
+    }
+    if (ret != DB_NOTFOUND) {
+        dbp->err(dbp, ret, "DBcursor->get");
+        fprintf(stderr, "Cursor ERROR\n");
+        exit(0);
+    }
+    if (cin == 0 || flag==0) {
+        fprintf(stderr, "Data not exist\n");
+        return NULL;
+    }
+
+    /* Cursors must be closed */
+    if (dbcp != NULL)
+        dbcp->close(dbcp);
+    if (dbp != NULL)
+        dbp->close(dbp, 0);
+
+    return new_cin;
 }
