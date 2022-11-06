@@ -4,7 +4,18 @@
 #include <string.h>
 #include <time.h>
 #include "onem2m.h"
+int main() {
 
+    CNT cnt_after;
+    cnt_after.rn = "status1_updateeee";
+    cnt_after.ri = "3-20220513093154147745";
+
+    int flag = Update_CNT_DB(&cnt_after);
+    if(flag)
+        display(DATABASE);
+
+    return 0;
+}
 
 /*DB CREATE*/
 DB* DB_CREATE_(DB *dbp){
@@ -800,4 +811,123 @@ CIN* Get_CIN(char* ri) {
         dbp->close(dbp, 0);
 
     return new_cin;
+}
+
+int Update_AE_DB(AE* ae_object) {
+    DB* dbp;
+    DBC* dbcp;
+    DBT key_ri, data;
+    int ret;
+    char rr[6]="";
+
+    /* ri NULL ERROR*/
+    if(ae_object->ri==NULL){
+        fprintf(stderr,"ri NULL ERROR\n");
+        return 0;
+    }
+
+    //Struct to store in DB
+    AE* ae = (AE*)malloc(sizeof(AE));
+    ae = Get_AE(ae_object->ri);
+
+    if(ae_object->rn!=NULL) strcpy(ae->rn,ae_object->rn);
+    if(ae_object->pi!=NULL) strcpy(ae->pi,ae_object->pi);
+    if(ae_object->ct!=NULL) strcpy(ae->ct,ae_object->ct);
+    if(ae_object->lt!=NULL) strcpy(ae->lt,ae_object->lt);
+    if(ae_object->et!=NULL) strcpy(ae->et,ae_object->et);
+    if(ae_object->api!=NULL) strcpy(ae->api,ae_object->api);
+    if(ae_object->aei!=NULL) strcpy(ae->aei,ae_object->aei);
+    else if(ae_object->rr == true || ae_object->rr == '\0') strcpy(rr,"true");
+    else strcpy(rr,"false");
+    if(ae_object->ty!=0) ae->ty=ae_object->ty;
+
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+
+    /* key and data must initialize */
+    memset(&key_ri, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    /* initialize the data to be the first of two duplicate records. */
+    key_ri.data = ae_object->ri;
+    key_ri.size = strlen(ae_object->ri) + 1;
+
+    /* List data excluding 'ri' as strings using delimiters. */
+    char str[DB_STR_MAX]= "\0";
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%s",
+            ae->rn,ae->pi,ae->ty,ae->ct,ae->lt,
+            ae->et,ae->api,rr,ae->aei);
+
+    data.data = str;
+    data.size = strlen(str) + 1;
+    
+    /* input DB */
+    if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
+        dbp->err(dbp, ret, "db->cursor");
+
+    /* DB close */
+    dbcp->close(dbcp);
+    dbp->close(dbp, 0); 
+
+    return 1;
+}
+
+int Update_CNT_DB(CNT* cnt_object) {
+    DB* dbp;
+    DBC* dbcp;
+    DBT key_ri, data;
+    int ret;
+    char rr[6]="";
+
+    /* ri NULL ERROR*/
+    if(cnt_object->ri==NULL){
+        fprintf(stderr,"ri NULL ERROR\n");
+        return 0;
+    }
+
+    //Struct to store in DB
+    CNT* cnt = (CNT*)malloc(sizeof(CNT));
+    cnt = Get_CNT(cnt_object->ri);
+
+    if(cnt_object->rn!=NULL) strcpy(cnt->rn,cnt_object->rn);
+    if(cnt_object->pi!=NULL) strcpy(cnt->pi,cnt_object->pi);
+    if(cnt_object->ct!=NULL) strcpy(cnt->ct,cnt_object->ct);
+    if(cnt_object->lt!=NULL) strcpy(cnt->lt,cnt_object->lt);
+    if(cnt_object->et!=NULL) strcpy(cnt->et,cnt_object->et);
+    if(cnt_object->ty!=0) cnt->ty=cnt_object->ty;
+    if(cnt_object->cbs!=0) cnt->ty=cnt_object->cbs;
+    if(cnt_object->cni!=0) cnt->ty=cnt_object->cni;       
+    if(cnt_object->st!=0) cnt->ty=cnt_object->st;
+
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+
+    /* key and data must initialize */
+    memset(&key_ri, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    /* initialize the data to be the first of two duplicate records. */
+    key_ri.data = cnt_object->ri;
+    key_ri.size = strlen(cnt_object->ri) + 1;
+
+    /* List data excluding 'ri' as strings using delimiters. */
+    char str[DB_STR_MAX]= "\0";
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%d,%d,%d",
+            cnt->rn,cnt->pi,cnt->ty,cnt->ct,cnt->lt,
+            cnt->et,cnt->cbs,cnt->cni,cnt->st);
+
+    data.data = str;
+    data.size = strlen(str) + 1;
+    
+    /* input DB */
+    if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
+        dbp->err(dbp, ret, "db->cursor");
+
+    /* DB close */
+    dbcp->close(dbcp);
+    dbp->close(dbp, 0); 
+
+    return 1;
 }

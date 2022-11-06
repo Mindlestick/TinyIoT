@@ -170,18 +170,17 @@ int Store_CIN(CIN* cin_object);
 int Store_Sub(Sub* sub_object);
 int Store_ACP(ACP *acp_object);
 
-CSE* Get_CSE();
+CSE* Get_CSE(char* ri);
 AE* Get_AE(char* ri);
 CNT* Get_CNT(char* ri);
 CIN* Get_CIN(char* ri);
 Sub* Get_Sub(char* ri);
 ACP* Get_ACP(char* ri);
 
-int DB_Update_AE(AE* ae_object);
-int DB_Update_CNT(CNT* cnt_object);
+int Update_AE_DB(AE* ae_object);
+int Update_CNT_DB(CNT* cnt_object);
 int Update_Sub(Sub *sub_object);
 int Update_ACP(ACP *acp_object);
-
 
 int Delete_CSE(char* ri);
 int Delete_AE(char* ri);
