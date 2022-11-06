@@ -273,7 +273,9 @@ int Store_CNT(CNT *cnt_object) {
     if (cnt_object->ct == NULL) cnt_object->ct = " ";
     if (cnt_object->lt == NULL) cnt_object->lt = " ";
     if (cnt_object->et == NULL) cnt_object->et = " ";
-
+    
+    if (cnt_object->lbl == NULL) cnt_object->lbl = " ";
+    if (cnt_object->acpi == NULL) cnt_object->acpi = " ";
     if (cnt_object->cni == '\0') cnt_object->cni = 0;
     if (cnt_object->cbs == '\0') cnt_object->cbs = 0;
     if (cnt_object->st == '\0') cnt_object->st = 0;
@@ -292,9 +294,9 @@ int Store_CNT(CNT *cnt_object) {
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%d,%d,%d",
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%d,%d,%d",
             cnt_object->rn,cnt_object->pi,cnt_object->ty,cnt_object->ct,cnt_object->lt,cnt_object->et,
-            cnt_object->cbs,cnt_object->cni,cnt_object->st);
+            cnt_object->lbl,cnt_object->acpi,cnt_object->cbs,cnt_object->cni,cnt_object->st);
 
     data.data = str;
     data.size = strlen(str) + 1;
@@ -653,16 +655,28 @@ CNT* Get_CNT(char* ri) {
                     idx++;
                     break;      
                 case 6:
+                    new_cnt->lbl = malloc(strlen(ptr));
+                    strcpy(new_cnt->lbl, ptr);
+
+                    idx++;
+                    break;   
+                case 7:
+                    new_cnt->acpi = malloc(strlen(ptr));
+                    strcpy(new_cnt->acpi, ptr);
+
+                    idx++;
+                    break;                                           
+                case 8:
                     new_cnt->cbs = atoi(ptr);
 
                     idx++;
                     break;     
-                case 7:
+                case 9:
                     new_cnt->cni = atoi(ptr);
 
                     idx++;
                     break;    
-                case 8:
+                case 10:
                     new_cnt->st = atoi(ptr);
 
                     idx++;
@@ -895,12 +909,13 @@ int Update_CNT_DB(CNT* cnt_object) {
     if(cnt_object->ct!=NULL) strcpy(cnt->ct,cnt_object->ct);
     if(cnt_object->lt!=NULL) strcpy(cnt->lt,cnt_object->lt);
     if(cnt_object->et!=NULL) strcpy(cnt->et,cnt_object->et);
+
     if(cnt_object->lbl!=NULL) strcpy(cnt->lbl,cnt_object->lbl);
     if(cnt_object->acpi!=NULL) strcpy(cnt->acpi,cnt_object->acpi);    
     if(cnt_object->ty!=0) cnt->ty=cnt_object->ty;
-    if(cnt_object->cbs!=0) cnt->ty=cnt_object->cbs;
-    if(cnt_object->cni!=0) cnt->ty=cnt_object->cni;       
-    if(cnt_object->st!=0) cnt->ty=cnt_object->st;
+    if(cnt_object->cbs!=0) cnt->cbs=cnt_object->cbs;
+    if(cnt_object->cni!=0) cnt->cni=cnt_object->cni;       
+    if(cnt_object->st!=0) cnt->st=cnt_object->st;
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp);
@@ -931,5 +946,42 @@ int Update_CNT_DB(CNT* cnt_object) {
     dbcp->close(dbcp);
     dbp->close(dbp, 0); 
 
+    return 1;
+}
+
+int Delete(char* ri) {
+    DB* dbp;
+    DBC* dbcp;
+    DBT key, data;
+    int ret;
+    int flag = 0;
+
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+
+    /* Initialize the key/data return pair. */
+    memset(&key, 0, sizeof(key));
+    memset(&data, 0, sizeof(data));
+
+    while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
+        if (strncmp(key.data, ri, key.size) == 0) {
+            flag = 1;
+            dbcp->del(dbcp, 0);
+            break;
+        }
+    }
+    if (flag == 0) {
+        fprintf(stderr, "Not Found\n");
+        return 0;
+    }
+
+    /* Cursors must be closed */
+    if (dbcp != NULL)
+        dbcp->close(dbcp);
+    if (dbp != NULL)
+        dbp->close(dbp, 0);
+    
+    /* Delete Success */
     return 1;
 }
