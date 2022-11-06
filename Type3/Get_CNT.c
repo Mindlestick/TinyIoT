@@ -8,7 +8,7 @@
 CNT* Get_CNT(char* ri);
 int main() {
     CNT *cnt = Get_CNT("3-20220513093154147745");
-    printf("%s\n",cnt->rn);
+    printf("%s\n",cnt->lbl);
 
     return 0;
 }
@@ -121,16 +121,28 @@ CNT* Get_CNT(char* ri) {
                     idx++;
                     break;      
                 case 6:
+                    new_cnt->lbl = malloc(strlen(ptr));
+                    strcpy(new_cnt->lbl, ptr);
+
+                    idx++;
+                    break;   
+                case 7:
+                    new_cnt->acpi = malloc(strlen(ptr));
+                    strcpy(new_cnt->acpi, ptr);
+
+                    idx++;
+                    break;                                           
+                case 8:
                     new_cnt->cbs = atoi(ptr);
 
                     idx++;
                     break;     
-                case 7:
+                case 9:
                     new_cnt->cni = atoi(ptr);
 
                     idx++;
                     break;    
-                case 8:
+                case 10:
                     new_cnt->st = atoi(ptr);
 
                     idx++;

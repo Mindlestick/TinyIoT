@@ -10,6 +10,7 @@ int main() {
     CNT cnt_after;
     cnt_after.rn = "status1_updateeee";
     cnt_after.ri = "3-20220513093154147745";
+    cnt_after.lbl = "lbl_update";
 
     int flag = Update_CNT_DB(&cnt_after);
     if(flag)
@@ -78,6 +79,8 @@ int Update_CNT_DB(CNT* cnt_object) {
     if(cnt_object->ct!=NULL) strcpy(cnt->ct,cnt_object->ct);
     if(cnt_object->lt!=NULL) strcpy(cnt->lt,cnt_object->lt);
     if(cnt_object->et!=NULL) strcpy(cnt->et,cnt_object->et);
+    if(cnt_object->lbl!=NULL) strcpy(cnt->lbl,cnt_object->lbl);
+    if(cnt_object->acpi!=NULL) strcpy(cnt->acpi,cnt_object->acpi);    
     if(cnt_object->ty!=0) cnt->ty=cnt_object->ty;
     if(cnt_object->cbs!=0) cnt->ty=cnt_object->cbs;
     if(cnt_object->cni!=0) cnt->ty=cnt_object->cni;       
@@ -97,9 +100,9 @@ int Update_CNT_DB(CNT* cnt_object) {
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%d,%d,%d",
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%d,%d,%d",
             cnt->rn,cnt->pi,cnt->ty,cnt->ct,cnt->lt,
-            cnt->et,cnt->cbs,cnt->cni,cnt->st);
+            cnt->et,cnt->lbl,cnt->acpi,cnt->cbs,cnt->cni,cnt->st);
 
     data.data = str;
     data.size = strlen(str) + 1;

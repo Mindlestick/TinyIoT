@@ -23,6 +23,9 @@ int main() {
     cnt1.et = "20220513T093154";
     cnt1.cni = 0;
     cnt1.cbs = 0;
+    cnt1.lbl = "lbl1";
+    cnt1.acpi = "acpi1";
+
 
     cnt2.pi = "TAE1";
     cnt2.ri = "3-20210513093154147745";
@@ -34,6 +37,8 @@ int main() {
     cnt2.et = "20210513T093154";
     cnt2.cni = 0;
     cnt2.cbs = 0;
+    cnt2.lbl = "lbl2";
+    cnt2.acpi = "acpi2";
 
     // [success -> 1] 
     if(Store_CNT(&cnt1)) fprintf(stderr, "store success!\n");
@@ -104,7 +109,9 @@ int Store_CNT(CNT *cnt_object) {
     if (cnt_object->ct == NULL) cnt_object->ct = " ";
     if (cnt_object->lt == NULL) cnt_object->lt = " ";
     if (cnt_object->et == NULL) cnt_object->et = " ";
-
+    
+    if (cnt_object->lbl == NULL) cnt_object->lbl = " ";
+    if (cnt_object->acpi == NULL) cnt_object->acpi = " ";
     if (cnt_object->cni == '\0') cnt_object->cni = 0;
     if (cnt_object->cbs == '\0') cnt_object->cbs = 0;
     if (cnt_object->st == '\0') cnt_object->st = 0;
@@ -123,9 +130,9 @@ int Store_CNT(CNT *cnt_object) {
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%d,%d,%d",
+    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%d,%d,%d",
             cnt_object->rn,cnt_object->pi,cnt_object->ty,cnt_object->ct,cnt_object->lt,cnt_object->et,
-            cnt_object->cbs,cnt_object->cni,cnt_object->st);
+            cnt_object->lbl,cnt_object->acpi,cnt_object->cbs,cnt_object->cni,cnt_object->st);
 
     data.data = str;
     data.size = strlen(str) + 1;
