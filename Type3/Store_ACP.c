@@ -24,6 +24,7 @@ ACP* StructGenerator(){
     }
     return acp;
 }
+
 /*DB CREATE*/
 DB* DB_CREATE_(DB *dbp){
     int ret;
@@ -32,20 +33,20 @@ DB* DB_CREATE_(DB *dbp){
     if (ret) {
         fprintf(stderr, "db_create : %s\n", db_strerror(ret));
         fprintf(stderr, "File ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
     if (ret) {
         dbp->err(dbp, ret, "%s", DATABASE);
         fprintf(stderr, "DB Open ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
@@ -57,7 +58,7 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     if ((ret = dbp->cursor(dbp, NULL, &dbcp, 0)) != 0) {
         dbp->err(dbp, ret, "DB->cursor");
         fprintf(stderr, "Cursor ERROR");
-        exit(0);
+        return NULL;
     }
     return dbcp;
 }
@@ -96,17 +97,17 @@ int main() {
     acp.pvs_acop = "63";
 
     // [success -> 1] 
-    if(Store_ACP(&acp)) fprintf(stderr, "store success!\n");
+    if(DB_Store_ACP(&acp)) fprintf(stderr, "store success!\n");
 
     // print
-    //char* DATABASE = "ACP.db";
-    display(DATABASE);
+    char* DATABASE = "ACP.db";
+    DB_display(DATABASE);
 
     return 0;
 }
 
-int Store_ACP(ACP *acp_object) {
-    //char* DATABASE = "ACP.db";
+int DB_Store_ACP(ACP *acp_object) {
+    char* DATABASE = "ACP.db";
 
     DB* dbp;    // db handle
     DBC* dbcp;
@@ -119,10 +120,10 @@ int Store_ACP(ACP *acp_object) {
     // if input == NULL
     if (acp_object->ri == NULL) {
         fprintf(stderr, "ri is NULL\n");
-        return 0;
+        return -1;
     }
     if (acp_object->rn == NULL) acp_object->rn = " ";
-    if (acp_object->pi == NULL) acp_object->pi = "NULL";
+    if (acp_object->pi == NULL) acp_object->pi = " ";
     if (acp_object->ty == '\0') acp_object->ty = 0;
     if (acp_object->ct == NULL) acp_object->ct = " ";
     if (acp_object->lt == NULL) acp_object->lt = " ";
@@ -135,7 +136,7 @@ int Store_ACP(ACP *acp_object) {
   
 
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
 
     /* keyand data must initialize */
@@ -149,7 +150,7 @@ int Store_ACP(ACP *acp_object) {
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
     //strcat(str,acp_object->rn);
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%s,%s",
+    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%s;%s",
             acp_object->rn,acp_object->pi,acp_object->ty,acp_object->ct,acp_object->lt,
             acp_object->et,acp_object->pv_acor,acp_object->pv_acop,acp_object->pvs_acor,acp_object->pvs_acop);
             
@@ -167,7 +168,7 @@ int Store_ACP(ACP *acp_object) {
     return 1;
 }
 
-int display(char* database)
+int DB_display(char* database)
 {
     printf("[Display] %s \n", database); //DB name print
 

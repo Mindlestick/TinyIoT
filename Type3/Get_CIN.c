@@ -5,9 +5,8 @@
 #include <db.h>
 #include "onem2m.h"
 
-CIN* Get_CIN(char* ri);
 int main() {
-    CIN *cin = Get_CIN("4-20220808T113154");
+    CIN *cin = DB_Get_CIN("4-20220808T113154");
     printf("%s\n",cin->csi);
 
     return 0;
@@ -27,7 +26,7 @@ DB* DB_CREATE_(DB *dbp){
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
@@ -51,11 +50,11 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-CIN* Get_CIN(char* ri) {
-    //char* DATABASE = "CIN.db";
+CIN* DB_Get_CIN(char* ri) {
+    char* DATABASE = "RESOURCE.db";
 
     //struct to return
-    CIN* new_cin = (CIN*)malloc(sizeof(CIN));
+    CIN* new_cin = calloc(1,sizeof(CIN));
 
     DB* dbp;
     DBC* dbcp;
@@ -67,7 +66,7 @@ CIN* Get_CIN(char* ri) {
     int idx = 0;
     
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
 
     /* Initialize the key/data return pair. */
@@ -79,65 +78,83 @@ CIN* Get_CIN(char* ri) {
         if (strncmp(key.data, ri, key.size) == 0) {
             flag=1;
             // ri = key
-            new_cin->ri = malloc(key.size);
+            new_cin->ri = calloc(key.size,sizeof(char));
             strcpy(new_cin->ri, key.data);
 
-            char *ptr = strtok((char*)data.data, ",");  //split first string
+            char *ptr = strtok((char*)data.data, DB_SEP);  //split first string
             while (ptr != NULL) { // Split to end of next string
                 switch (idx) {
                 case 0:
-                    new_cin->rn = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_cin->rn=NULL; //data is NULL
+                    else{
+                    new_cin->rn = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_cin->rn, ptr);
-
+                    }
                     idx++;
                     break;
                 case 1:
-                    new_cin->pi = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_cin->pi=NULL; //data is NULL
+                    else{
+                    new_cin->pi = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_cin->pi, ptr);
-
+                    }
                     idx++;
                     break;
                 case 2:
+                if(strcmp(ptr,"0")==0) new_cin->ty=0;
+                    else
                     new_cin->ty = atoi(ptr);
 
                     idx++;
                     break;
                 case 3:
-                    new_cin->ct = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_cin->ct=NULL; //data is NULL
+                    else{
+                    new_cin->ct = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_cin->ct, ptr);
-
+                    }
                     idx++;
                     break;
                 case 4:
-                    new_cin->lt = malloc(strlen(ptr));
+                    new_cin->lt = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_cin->lt, ptr);
 
                     idx++;
                     break;                
                 case 5:
-                    new_cin->et = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_cin->et=NULL; //data is NULL
+                    else{
+                    new_cin->et = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_cin->et, ptr);
-
+                    }
                     idx++;
                     break;      
                 case 6:
-                    new_cin->con = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_cin->con=NULL; //data is NULL
+                    else{
+                    new_cin->con = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_cin->con, ptr);
-
+                    }
                     idx++;
                     break;       
                 case 7:
-                    new_cin->csi = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_cin->csi=NULL; //data is NULL
+                    else{
+                    new_cin->csi = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_cin->csi, ptr);
-
+                    }
                     idx++;
                     break;   
                 case 8:
+                if(strcmp(ptr,"0")==0) new_cin->cs=0;
+                    else
                     new_cin->cs = atoi(ptr);
 
                     idx++;
                     break;            
                 case 9:
+                if(strcmp(ptr,"0")==0) new_cin->st=0;
+                    else
                     new_cin->st = atoi(ptr);
 
                     idx++;
@@ -146,7 +163,7 @@ CIN* Get_CIN(char* ri) {
                     idx=-1;
                 }
                 
-                ptr = strtok(NULL, ","); //The delimiter is ,
+                ptr = strtok(NULL, DB_SEP); //The delimiter is ;
             }
         }
     }

@@ -5,7 +5,6 @@
 #include <db.h>
 #include "onem2m.h"
 
-ACP* Get_ACP(char* ri);
 int main() {
     /*
     double start, end;
@@ -24,7 +23,6 @@ int main() {
 
     return 0;
 }
-
 /*DB CREATE*/
 DB* DB_CREATE_(DB *dbp){
     int ret;
@@ -33,20 +31,20 @@ DB* DB_CREATE_(DB *dbp){
     if (ret) {
         fprintf(stderr, "db_create : %s\n", db_strerror(ret));
         fprintf(stderr, "File ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
     if (ret) {
         dbp->err(dbp, ret, "%s", DATABASE);
         fprintf(stderr, "DB Open ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
@@ -58,16 +56,16 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     if ((ret = dbp->cursor(dbp, NULL, &dbcp, 0)) != 0) {
         dbp->err(dbp, ret, "DB->cursor");
         fprintf(stderr, "Cursor ERROR");
-        exit(0);
+        return NULL;
     }
     return dbcp;
 }
 
-ACP* Get_ACP(char* ri) {
-    //char* DATABASE = "ACP.db";
+ACP* DB_Get_ACP(char* ri) {
+    char* DATABASE = "ACP.db";
 
     //struct to return
-    ACP* new_acp = (ACP*)malloc(sizeof(ACP));
+    ACP* new_acp = calloc(1,sizeof(ACP));
 
     DB* dbp;
     DBC* dbcp;
@@ -79,7 +77,7 @@ ACP* Get_ACP(char* ri) {
     int idx = 0;
     
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
 
     /* Initialize the key/data return pair. */
@@ -91,83 +89,101 @@ ACP* Get_ACP(char* ri) {
         if (strncmp(key.data, ri, key.size) == 0) {
             flag=1;
             // ri = key
-            new_acp->ri = malloc(key.size);
+            new_acp->ri =calloc(key.size,sizeof(char));
             strcpy(new_acp->ri, key.data);
 
-            char *ptr = strtok((char*)data.data, ",");  //split first string
+            char *ptr = strtok((char*)data.data, DB_SEP);  //split first string
             while (ptr != NULL) { // Split to end of next string
                 switch (idx) {
-                case 0:
-                    new_acp->rn = malloc(strlen(ptr));
+                case 0:if(strcmp(ptr," ")==0) new_acp->rn=NULL; //data is NULL
+                else{
+                    new_acp->rn = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_acp->rn, ptr);
-
+                    }
                     idx++;
                     break;
                 case 1:
-                    new_acp->pi = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_acp->pi=NULL; //data is NULL
+                else{
+                    new_acp->pi = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_acp->pi, ptr);
-
+                    }
                     idx++;
                     break;
                 case 2:
-                    new_acp->ty = atoi(ptr);
+                if(strcmp(ptr,"0")==0) new_acp->ty=0;
+                else new_acp->ty = atoi(ptr);
 
                     idx++;
                     break;
                 case 3:
-                    new_acp->ct = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_acp->ct=NULL; //data is NULL
+                else{
+                    new_acp->ct = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_acp->ct, ptr);
-
+                    }
                     idx++;
                     break;
                 case 4:
-                    new_acp->lt = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_acp->lt=NULL; //data is NULL
+                else{
+                    new_acp->lt = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_acp->lt, ptr);
-
+                    }
                     idx++;
                     break;                
                 case 5:
-                    new_acp->et = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_acp->et=NULL; //data is NULL
+                else{
+                    new_acp->et = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_acp->et, ptr);
-
+                }
                     idx++;
                     break;
                 case 6:
-                    new_acp->pv_acor = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_acp->pv_acor=NULL; //data is NULL
+                else{
+                    new_acp->pv_acor = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_acp->pv_acor, ptr);
-
+                }
                     idx++;
                     break;
                 case 7:
-                    new_acp->pv_acop = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_acp->pv_acop=NULL; //data is NULL
+                else{
+                    new_acp->pv_acop = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_acp->pv_acop, ptr);
-
+                }
                     idx++;
                     break;
                 case 8:
-                    new_acp->pvs_acor = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_acp->pvs_acor=NULL; //data is NULL
+                else{
+                    new_acp->pvs_acor = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_acp->pvs_acor, ptr);
-
+                }
                     idx++;
                     break;
                 case 9:
-                    new_acp->pvs_acop = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_acp->pvs_acop=NULL; //data is NULL
+                else{
+                    new_acp->pvs_acop = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_acp->pvs_acop, ptr);
-
+                }
                     idx++;
                     break;                
                 default:
                     idx=-1;
                 }
                 
-                ptr = strtok(NULL, ","); //The delimiter is ,
+                ptr = strtok(NULL, DB_SEP); //The delimiter is ;
             }
         }
     }
     if (ret != DB_NOTFOUND) {
         dbp->err(dbp, ret, "DBcursor->get");
         fprintf(stderr, "Cursor ERROR\n");
-        exit(0);
+        return NULL;
     }
     if (cnt == 0 || flag==0) {
         fprintf(stderr, "Data not exist\n");

@@ -36,11 +36,11 @@ int main() {
     ae2.aei = "TAE2";
 
     // [success -> 1] 
-    if(Store_AE(&ae1)) fprintf(stderr, "store success!\n");
-    if(Store_AE(&ae2)) fprintf(stderr, "store success!\n");
+    if(DB_Store_AE(&ae1)) fprintf(stderr, "store success!\n");
+    if(DB_Store_AE(&ae2)) fprintf(stderr, "store success!\n");
 
-    //char* DATABASE = "RESOURCE.db";
-    display(DATABASE);
+    char* DATABASE = "RESOURCE.db";
+    DB_display(DATABASE);
 
     return 0;
 }
@@ -59,18 +59,17 @@ DB* DB_CREATE_(DB *dbp){
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
     if (ret) {
         dbp->err(dbp, ret, "%s", DATABASE);
         fprintf(stderr, "DB Open ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
-
 /*DB Get Cursor*/
 DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     int ret;
@@ -83,8 +82,8 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int Store_AE(AE *ae_object) {
-    //char* DATABASE = "AE.db";
+int DB_Store_AE(AE *ae_object) {
+    char* DATABASE = "RESOURCE.db";
 
     DB* dbp;    // db handle
     DBC* dbcp;
@@ -100,21 +99,20 @@ int Store_AE(AE *ae_object) {
         return 0;
     }
     if (ae_object->rn == NULL) ae_object->rn = " ";
-    if (ae_object->pi == NULL) ae_object->pi = "NULL";
+    if (ae_object->pi == NULL) ae_object->pi = " ";
     if (ae_object->ty == '\0') ae_object->ty = 0;
     if (ae_object->ct == NULL) ae_object->ct = " ";
     if (ae_object->lt == NULL) ae_object->lt = " ";
     if (ae_object->et == NULL) ae_object->et = " ";
 
-    if (ae_object->rr == '\0') ae_object->rr = true;
-    else if(ae_object->rr == true) strcpy(rr,"true");
-    else strcpy(rr,"false");
+    if(ae_object->rr == false) strcpy(rr,"false");
+    else strcpy(rr,"true");
 
     if (ae_object->api == NULL) ae_object->api = " ";
     if (ae_object->aei == NULL) ae_object->aei = " ";
 
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
     
     /* key and data must initialize */
@@ -127,7 +125,7 @@ int Store_AE(AE *ae_object) {
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%s",
+    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%s",
             ae_object->rn,ae_object->pi,ae_object->ty,ae_object->ct,ae_object->lt,
             ae_object->et,ae_object->api,rr,ae_object->aei);
 
@@ -145,7 +143,7 @@ int Store_AE(AE *ae_object) {
     return 1;
 }
 
-int display(char* database)
+int DB_display(char* database)
 {
     printf("[Display] %s \n", database); //DB name print
 

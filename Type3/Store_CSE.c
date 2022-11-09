@@ -15,18 +15,17 @@ int main() {
     //input sample
     cse.rn = "cse1";
     cse.ri = "5-20191210093452845";
-    cse.pi = "NULL";
-    cse.ty = 5;
+    cse.pi = "NUL";
+    //cse.ty = 5;
     cse.ct = "20191210T093452";
     cse.lt = "20191210T093452";
     cse.csi = "/Tiny Project1";
 
     // [success -> 1] 
-    if(Store_CSE(&cse)) fprintf(stderr, "store success!\n");
+    if(DB_Store_CSE(&cse)) fprintf(stderr, "store success!\n");
 
     // print
-    //char* DATABASE = "RESOURCE.db";
-    display(DATABASE);
+    DB_display("RESOURCE.db");
 
     return 0;
 }
@@ -45,7 +44,7 @@ DB* DB_CREATE_(DB *dbp){
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
@@ -69,8 +68,8 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int Store_CSE(CSE *cse_object) {
-    //char* DATABASE = "CSE.db";
+int DB_Store_CSE(CSE *cse_object) {
+    char* DATABASE = "RESOURCE.db";
 
     DB* dbp;    // db handle
     DBC* dbcp;
@@ -83,17 +82,17 @@ int Store_CSE(CSE *cse_object) {
     // if input == NULL
     if (cse_object->ri == NULL) {
         fprintf(stderr, "ri is NULL\n");
-        return 0;
+        return -1;
     }
     if (cse_object->rn == NULL) cse_object->rn = " ";
-    if (cse_object->pi == NULL) cse_object->pi = "NULL";
+    if (cse_object->pi == NULL) cse_object->pi = " ";
     if (cse_object->ty == '\0') cse_object->ty = 0;
     if (cse_object->ct == NULL) cse_object->ct = " ";
     if (cse_object->lt == NULL) cse_object->lt = " ";
     if (cse_object->csi == NULL) cse_object->csi = " ";
 
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
     
     /* key and data must initialize */
@@ -106,7 +105,7 @@ int Store_CSE(CSE *cse_object) {
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s,%s,%d,%s,%s,%s",
+    sprintf(str, "%s;%s;%d;%s;%s;%s",
             cse_object->rn,cse_object->pi,cse_object->ty,cse_object->ct,cse_object->lt,cse_object->csi);
 
     data.data = str;
@@ -123,7 +122,7 @@ int Store_CSE(CSE *cse_object) {
     return 1;
 }
 
-int display(char* database)
+int DB_display(char* database)
 {
     printf("[Display] %s \n", database); //DB name print
 
@@ -138,7 +137,7 @@ int display(char* database)
     if ((ret = db_create(&dbp, NULL, 0)) != 0) {
         fprintf(stderr,
             "%s: db_create: %s\n", database, db_strerror(ret));
-        return (1);
+        return -1;
     }
     close_db = 1;
 
@@ -191,7 +190,7 @@ int display(char* database)
     if (ret != DB_NOTFOUND) {
         dbp->err(dbp, ret, "DBcursor->get");
         printf("Cursor ERROR\n");
-        exit(0);
+        return -1;
     }
 
 
@@ -200,5 +199,5 @@ dbp->err(dbp, ret, "DBcursor->close");
 if (close_db && (ret = dbp->close(dbp, 0)) != 0)
 fprintf(stderr,
     "%s: DB->close: %s\n", database, db_strerror(ret));
-return (0);
+return -1;
 }

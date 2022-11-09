@@ -7,14 +7,13 @@
 
 int main() {
 
-    AE ae_after;
-    ae_after.rn = "Sensor2_updateeee";
-    ae_after.ri = "TAE2";
-    ae_after.api = "tinyProject2_update";
+    ACP acp_after;
+    acp_after.rn = "acp_updateeee";
+    acp_after.ri = "1-20191210093452845";
 
-    int flag = Update_AE_DB(&ae_after);
-    if(flag)
-        display(DATABASE);
+    int flag = DB_Update_ACP(&acp_after);
+    if(flag==1)
+        DB_display("ACP.db");
 
     return 0;
 }
@@ -33,14 +32,14 @@ DB* DB_CREATE_(DB *dbp){
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
     if (ret) {
         dbp->err(dbp, ret, "%s", DATABASE);
         fprintf(stderr, "DB Open ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
@@ -57,38 +56,38 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int Update_AE_DB(AE* ae_object) {
+int DB_Update_ACP(ACP* acp_object) {
+    char* DATABASE = "ACP.db";    
     DB* dbp;
     DBC* dbcp;
     DBT key_ri, data;
     int ret;
-    char rr[6]="";
 
     /* ri NULL ERROR*/
-    if(ae_object->ri==NULL){
+    if(acp_object->ri==NULL){
         fprintf(stderr,"ri NULL ERROR\n");
-        return 0;
+        return -1;
     }
 
     //Struct to store in DB
-    AE* ae = (AE*)malloc(sizeof(AE));
-    ae = Get_AE(ae_object->ri);
+    ACP* acp = calloc(1,sizeof(ACP));
+    acp = DB_Get_ACP(acp_object->ri);
 
-    if(ae_object->rn!=NULL) strcpy(ae->rn,ae_object->rn);
-    if(ae_object->pi!=NULL) strcpy(ae->pi,ae_object->pi);
-    if(ae_object->ct!=NULL) strcpy(ae->ct,ae_object->ct);
-    if(ae_object->lt!=NULL) strcpy(ae->lt,ae_object->lt);
-    if(ae_object->et!=NULL) strcpy(ae->et,ae_object->et);
-    if(ae_object->api!=NULL) strcpy(ae->api,ae_object->api);
-    if(ae_object->aei!=NULL) strcpy(ae->aei,ae_object->aei);
-    else if(ae_object->rr == true || ae_object->rr == '\0') strcpy(rr,"true");
-    else strcpy(rr,"false");
-    if(ae_object->ty!=0) ae->ty=ae_object->ty;
+    if(acp_object->rn!=NULL) strcpy(acp->rn,acp_object->rn);
+    if(acp_object->pi!=NULL) strcpy(acp->pi,acp_object->pi);
+    if(acp_object->ct!=NULL) strcpy(acp->ct,acp_object->ct);
+    if(acp_object->lt!=NULL) strcpy(acp->lt,acp_object->lt);
+    if(acp_object->et!=NULL) strcpy(acp->et,acp_object->et);
+    if(acp_object->pv_acor!=NULL) strcpy(acp->pv_acor,acp_object->pv_acor);
+    if(acp_object->pv_acop!=NULL) strcpy(acp->pv_acop,acp_object->pv_acop);
+    if(acp_object->pvs_acor!=NULL) strcpy(acp->pvs_acor,acp_object->pvs_acor);       
+    if(acp_object->pvs_acop!=NULL) strcpy(acp->pvs_acop,acp_object->pvs_acop);    
+    if(acp_object->ty!=0) acp->ty=acp_object->ty;
    
 
 
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
 
     /* key and data must initialize */
@@ -96,14 +95,14 @@ int Update_AE_DB(AE* ae_object) {
     memset(&data, 0, sizeof(DBT));
 
     /* initialize the data to be the first of two duplicate records. */
-    key_ri.data = ae_object->ri;
-    key_ri.size = strlen(ae_object->ri) + 1;
+    key_ri.data = acp_object->ri;
+    key_ri.size = strlen(acp_object->ri) + 1;
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%s",
-            ae->rn,ae->pi,ae->ty,ae->ct,ae->lt,
-            ae->et,ae->api,rr,ae->aei);
+    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%s",
+            acp->rn,acp->pi,acp->ty,acp->ct,acp->lt,
+            acp->et,acp->pv_acor,acp->pv_acop,acp->pvs_acor,acp->pvs_acop);
 
     data.data = str;
     data.size = strlen(str) + 1;
@@ -119,7 +118,7 @@ int Update_AE_DB(AE* ae_object) {
     return 1;
 }
 
-int display(char* database)
+int DB_display(char* database)
 {
     printf("[Display] %s \n", database); //DB name print
 

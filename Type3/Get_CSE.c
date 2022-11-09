@@ -5,11 +5,13 @@
 #include <db.h>
 #include "onem2m.h"
 
-CSE* Get_CSE(char* ri);
 int main() {
-    CSE *cse = Get_CSE("5-20191210093452845");
-    printf("%s\n",cse->rn);
+    CSE *cse = DB_Get_CSE("5-20191210093452845");
 
+    if(cse->ty!=0)
+        printf("%d",cse->ty);
+    else
+        printf("NULL");
     return 0;
 }
 
@@ -21,20 +23,20 @@ DB* DB_CREATE_(DB *dbp){
     if (ret) {
         fprintf(stderr, "db_create : %s\n", db_strerror(ret));
         fprintf(stderr, "File ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
     if (ret) {
         dbp->err(dbp, ret, "%s", DATABASE);
         fprintf(stderr, "DB Open ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
@@ -46,16 +48,16 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     if ((ret = dbp->cursor(dbp, NULL, &dbcp, 0)) != 0) {
         dbp->err(dbp, ret, "DB->cursor");
         fprintf(stderr, "Cursor ERROR");
-        exit(0);
+        return NULL;
     }
     return dbcp;
 }
 
-CSE* Get_CSE(char* ri) {
-    //char* DATABASE = "CSE.db";
+CSE* DB_Get_CSE(char* ri) {
+    char* DATABASE = "RESOURCE.db";
 
     //struct to return
-    CSE* new_cse = (CSE*)malloc(sizeof(CSE));
+    CSE* new_cse= calloc(1,sizeof(CSE));
 
     DB* dbp;
     DBC* dbcp;
@@ -67,7 +69,7 @@ CSE* Get_CSE(char* ri) {
     int idx = 0;
     
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
 
     /* Initialize the key/data return pair. */
@@ -79,59 +81,71 @@ CSE* Get_CSE(char* ri) {
         if (strncmp(key.data, ri, key.size) == 0) {
             flag=1;
             // ri = key
-            new_cse->ri = malloc(key.size);
+            new_cse->ri = calloc(key.size,sizeof(char));
             strcpy(new_cse->ri, key.data);
 
-            char *ptr = strtok((char*)data.data, ",");  //split first string
+            char *ptr = strtok((char*)data.data,DB_SEP);  //split first string
             while (ptr != NULL) { // Split to end of next string
+
                 switch (idx) {
                 case 0:
-                    new_cse->rn = malloc(strlen(ptr));
-                    strcpy(new_cse->rn, ptr);
-
+                    if(strcmp(ptr," ")==0) new_cse->rn=NULL; //data is NULL
+                    else{
+                        new_cse->rn = calloc(strlen(ptr),sizeof(char));
+                        strcpy(new_cse->rn, ptr);
+                    }
                     idx++;
                     break;
                 case 1:
-                    new_cse->pi = malloc(strlen(ptr));
-                    strcpy(new_cse->pi, ptr);
-
+                    if(strcmp(ptr," ")==0) new_cse->pi=NULL; //data is NULL
+                    else{
+                        new_cse->pi = calloc(strlen(ptr),sizeof(char));
+                        strcpy(new_cse->pi, ptr);
+                    }
                     idx++;
                     break;
                 case 2:
-                    new_cse->ty = atoi(ptr);
+                    if(strcmp(ptr,"0")==0) new_cse->ty=0;
+                    else {new_cse->ty = atoi(ptr);}
 
                     idx++;
                     break;
                 case 3:
-                    new_cse->ct = malloc(strlen(ptr));
-                    strcpy(new_cse->ct, ptr);
-
+                    if(strcmp(ptr," ")==0) new_cse->ct=NULL; //data is NULL
+                    else{
+                        new_cse->ct = calloc(strlen(ptr),sizeof(char));
+                        strcpy(new_cse->ct, ptr);
+                    }
                     idx++;
                     break;
                 case 4:
-                    new_cse->lt = malloc(strlen(ptr));
+                    if(strcmp(ptr," ")==0) new_cse->lt=NULL;
+                    else{
+                    new_cse->lt = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_cse->lt, ptr);
-
+                    }
                     idx++;
                     break;                
                 case 5:
-                    new_cse->csi = malloc(strlen(ptr));
+                if(strcmp(ptr," ")==0) new_cse->csi=NULL;
+                else{
+                    new_cse->csi = calloc(strlen(ptr),sizeof(char));
                     strcpy(new_cse->csi, ptr);
-
+                }
                     idx++;
                     break;             
                 default:
                     idx=-1;
                 }
                 
-                ptr = strtok(NULL, ","); //The delimiter is ,
+                ptr = strtok(NULL, DB_SEP); //The delimiter is ;
             }
         }
     }
     if (ret != DB_NOTFOUND) {
         dbp->err(dbp, ret, "DBcursor->get");
         fprintf(stderr, "Cursor ERROR\n");
-        exit(0);
+        return NULL;
     }
     if (cnt == 0 || flag==0) {
         fprintf(stderr, "Data not exist\n");

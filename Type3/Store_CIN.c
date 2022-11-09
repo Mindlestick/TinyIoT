@@ -23,7 +23,7 @@ int main() {
     cin1.et = "20220513T093154";
     cin1.cs = 2;
     cin1.con = "ON";
-    cin1.csi = "test";
+    cin1.csi = "test1";
 
     cin2.pi = "3-20210513091700249586";
     cin2.ri = "4-20220808T113154";
@@ -38,11 +38,11 @@ int main() {
     cin2.csi = "test2";
 
     // [success -> 1] 
-    if(Store_CIN(&cin1)) fprintf(stderr, "store success!\n");
-    if(Store_CIN(&cin2)) fprintf(stderr, "store success!\n");
+    if(DB_Store_CIN(&cin1)) fprintf(stderr, "store success!\n");
+    if(DB_Store_CIN(&cin2)) fprintf(stderr, "store success!\n");
 
-    //char* DATABASE = "RESOURCE.db";
-    display(DATABASE);
+    char* DATABASE = "RESOURCE.db";
+    DB_display(DATABASE);
 
     return 0;
 }
@@ -61,7 +61,7 @@ DB* DB_CREATE_(DB *dbp){
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
@@ -85,8 +85,8 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int Store_CIN(CIN *cin_object) {
-    //char* DATABASE = "CIN.db";
+int DB_Store_CIN(CIN *cin_object) {
+    char* DATABASE = "RESOURCE.db";
 
     DB* dbp;    // db handle
     DBC* dbcp;
@@ -98,7 +98,7 @@ int Store_CIN(CIN *cin_object) {
     // if input == NULL
     if (cin_object->ri == NULL) {
         fprintf(stderr, "ri is NULL\n");
-        return 0;
+        return -1;
     }
     if (cin_object->rn == NULL) cin_object->rn = " ";
     if (cin_object->pi == NULL) cin_object->pi = "NULL";
@@ -113,7 +113,7 @@ int Store_CIN(CIN *cin_object) {
     if (cin_object->st == '\0') cin_object->st = 0;
 
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
     
     /* key and data must initialize */
@@ -126,7 +126,7 @@ int Store_CIN(CIN *cin_object) {
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%d,%d",
+    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%d;%d",
             cin_object->rn,cin_object->pi,cin_object->ty,cin_object->ct,cin_object->lt,cin_object->et,
             cin_object->con,cin_object->csi,cin_object->cs,cin_object->st);
 
@@ -144,7 +144,7 @@ int Store_CIN(CIN *cin_object) {
     return 1;
 }
 
-int display(char* database)
+int DB_display(char* database)
 {
     printf("[Display] %s \n", database); //DB name print
 

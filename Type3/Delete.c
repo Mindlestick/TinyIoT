@@ -5,8 +5,8 @@
 #include <db.h>
 #include "onem2m.h"
 int main() {
-    Delete_AE("TAE1");
-    display(DATABASE);
+    DB_Delete("TAE1");
+    DB_display("RESOURCE.db");
 
     return 0;
 }
@@ -24,14 +24,14 @@ DB* DB_CREATE_(DB *dbp){
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
     if (ret) {
         dbp->err(dbp, ret, "%s", DATABASE);
         fprintf(stderr, "DB Open ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
@@ -48,8 +48,8 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int Delete_AE(char* ri) {
-    //char* DATABASE = "AE.db";
+int DB_Delete(char* ri) {
+    char* DATABASE = "RESOURCE.db";
     DB* dbp;
     DBC* dbcp;
     DBT key, data;
@@ -57,7 +57,7 @@ int Delete_AE(char* ri) {
     int flag = 0;
 
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
 
     /* Initialize the key/data return pair. */
@@ -73,7 +73,7 @@ int Delete_AE(char* ri) {
     }
     if (flag == 0) {
         fprintf(stderr, "Not Found\n");
-        return 0;
+        return -1;
     }
 
     /* Cursors must be closed */
@@ -86,7 +86,7 @@ int Delete_AE(char* ri) {
     return 1;
 }
 
-int display(char* database)
+int DB_display(char* DATABASE)
 {
     printf("[Display] %s \n", DATABASE); //DB name print
 

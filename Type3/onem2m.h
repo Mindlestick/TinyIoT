@@ -2,7 +2,7 @@
 #include <stdbool.h>
 #include <db.h>
 #define DB_STR_MAX 500
-#define DATABASE "RESOURCE.db"
+#define DB_SEP ";"
 
 typedef enum {
 	o_CREATE = 1,
@@ -157,37 +157,34 @@ char* CNT_to_json(CNT* cnt_object);
 char* CIN_to_json(CIN* cin_object);
 
 //DB function
-int display(char* database);
+int DB_display(char* database);
 
 char* Label_To_URI(char* label);
 char* URI_To_Label(char* uri);
 int Store_Label(char* label, char* uri);
 
-int Store_CSE(CSE* cse_object);
-int Store_AE(AE* ae_object);
-int Store_CNT(CNT* cnt_object);
-int Store_CIN(CIN* cin_object);
-int Store_Sub(Sub* sub_object);
-int Store_ACP(ACP *acp_object);
+int DB_Store_CSE(CSE* cse_object);
+int DB_Store_AE(AE* ae_object);
+int DB_Store_CNT(CNT* cnt_object);
+int DB_Store_CIN(CIN* cin_object);
+int DB_Store_Sub(Sub* sub_object);
+int DB_Store_ACP(ACP *acp_object);
 
-CSE* Get_CSE(char* ri);
-AE* Get_AE(char* ri);
-CNT* Get_CNT(char* ri);
-CIN* Get_CIN(char* ri);
-Sub* Get_Sub(char* ri);
-ACP* Get_ACP(char* ri);
+CSE* DB_Get_CSE(char* ri);
+AE* DB_Get_AE(char* ri);
+CNT* DB_Get_CNT(char* ri);
+CIN* DB_Get_CIN(char* ri);
+Sub* DB_Get_Sub(char* ri);
+ACP* DB_Get_ACP(char* ri);
 
-int Update_AE_DB(AE* ae_object);
-int Update_CNT_DB(CNT* cnt_object);
-int Update_Sub(Sub *sub_object);
-int Update_ACP(ACP *acp_object);
+int DB_Update_AE(AE* ae_object);
+int DB_Update_CNT(CNT* cnt_object);
+int DB_Update_Sub(Sub *sub_object);
+int DB_Update_ACP(ACP *acp_object);
 
-int Delete_CSE(char* ri);
-int Delete_AE(char* ri);
-int Delete_CNT(char* ri);
-int Delete_CIN(char* ri);
-int Delete_Sub(char *ri);
-int Delete_ACP(char *ri);
+int DB_Delete(char* ri);
+int DB_Delete_SUB(char* ri);
+int DB_Delete_ACP(char* ri);
 
 Node* Get_All_CSE();
 Node* Get_All_AE();

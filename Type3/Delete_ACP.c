@@ -4,21 +4,12 @@
 #include <string.h>
 #include <db.h>
 #include "onem2m.h"
-
 int main() {
-
-    CNT cnt_after;
-    cnt_after.rn = "status1_updateeee";
-    cnt_after.ri = "3-20220513093154147745";
-    cnt_after.lbl = "lbl_update";
-
-    int flag = Update_CNT_DB(&cnt_after);
-    if(flag)
-        display(DATABASE);
+    DB_Delete_ACP("1-20191210093452845");
+    DB_display("ACP.db");
 
     return 0;
 }
-
 /*DB CREATE*/
 DB* DB_CREATE_(DB *dbp){
     int ret;
@@ -33,14 +24,14 @@ DB* DB_CREATE_(DB *dbp){
 }
 
 /*DB Open*/
-DB* DB_OPEN_(DB *dbp){
+DB* DB_OPEN_(DB *dbp,char* DATABASE){
     int ret;
 
     ret = dbp->open(dbp, NULL, DATABASE, NULL, DB_BTREE, DB_CREATE, 0664);
     if (ret) {
         dbp->err(dbp, ret, "%s", DATABASE);
         fprintf(stderr, "DB Open ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
@@ -57,70 +48,47 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int Update_CNT_DB(CNT* cnt_object) {
+int DB_Delete_ACP(char* ri) {
+    char* DATABASE = "ACP.db";
     DB* dbp;
     DBC* dbcp;
-    DBT key_ri, data;
+    DBT key, data;
     int ret;
-    char rr[6]="";
-
-    /* ri NULL ERROR*/
-    if(cnt_object->ri==NULL){
-        fprintf(stderr,"ri NULL ERROR\n");
-        return 0;
-    }
-
-    //Struct to store in DB
-    CNT* cnt = (CNT*)malloc(sizeof(CNT));
-    cnt = Get_CNT(cnt_object->ri);
-
-    if(cnt_object->rn!=NULL) strcpy(cnt->rn,cnt_object->rn);
-    if(cnt_object->pi!=NULL) strcpy(cnt->pi,cnt_object->pi);
-    if(cnt_object->ct!=NULL) strcpy(cnt->ct,cnt_object->ct);
-    if(cnt_object->lt!=NULL) strcpy(cnt->lt,cnt_object->lt);
-    if(cnt_object->et!=NULL) strcpy(cnt->et,cnt_object->et);
-    if(cnt_object->lbl!=NULL) strcpy(cnt->lbl,cnt_object->lbl);
-    if(cnt_object->acpi!=NULL) strcpy(cnt->acpi,cnt_object->acpi);    
-    if(cnt_object->ty!=0) cnt->ty=cnt_object->ty;
-    if(cnt_object->cbs!=0) cnt->ty=cnt_object->cbs;
-    if(cnt_object->cni!=0) cnt->ty=cnt_object->cni;       
-    if(cnt_object->st!=0) cnt->ty=cnt_object->st;
+    int flag = 0;
 
     dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
 
-    /* key and data must initialize */
-    memset(&key_ri, 0, sizeof(DBT));
-    memset(&data, 0, sizeof(DBT));
+    /* Initialize the key/data return pair. */
+    memset(&key, 0, sizeof(key));
+    memset(&data, 0, sizeof(data));
 
-    /* initialize the data to be the first of two duplicate records. */
-    key_ri.data = cnt_object->ri;
-    key_ri.size = strlen(cnt_object->ri) + 1;
+    while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
+        if (strncmp(key.data, ri, key.size) == 0) {
+            flag = 1;
+            dbcp->del(dbcp, 0);
+            break;
+        }
+    }
+    if (flag == 0) {
+        fprintf(stderr, "Not Found\n");
+        return -1;
+    }
 
-    /* List data excluding 'ri' as strings using delimiters. */
-    char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s,%s,%d,%s,%s,%s,%s,%s,%d,%d,%d",
-            cnt->rn,cnt->pi,cnt->ty,cnt->ct,cnt->lt,
-            cnt->et,cnt->lbl,cnt->acpi,cnt->cbs,cnt->cni,cnt->st);
-
-    data.data = str;
-    data.size = strlen(str) + 1;
+    /* Cursors must be closed */
+    if (dbcp != NULL)
+        dbcp->close(dbcp);
+    if (dbp != NULL)
+        dbp->close(dbp, 0);
     
-    /* input DB */
-    if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
-        dbp->err(dbp, ret, "db->cursor");
-
-    /* DB close */
-    dbcp->close(dbcp);
-    dbp->close(dbp, 0); 
-
+    /* Delete Success */
     return 1;
 }
 
-int display(char* database)
+int DB_display(char* DATABASE)
 {
-    printf("[Display] %s \n", database); //DB name print
+    printf("[Display] %s \n", DATABASE); //DB name print
 
     DB* dbp;
     DBC* dbcp;
@@ -129,26 +97,26 @@ int display(char* database)
 
     close_db = close_dbc = 0;
 
-    /* Open the database. */
+    /* Open the DATABASE. */
     if ((ret = db_create(&dbp, NULL, 0)) != 0) {
         fprintf(stderr,
-            "%s: db_create: %s\n", database, db_strerror(ret));
+            "%s: db_create: %s\n", DATABASE, db_strerror(ret));
         return (1);
     }
     close_db = 1;
 
     /* Turn on additional error output. */
     dbp->set_errfile(dbp, stderr);
-    dbp->set_errpfx(dbp, database);
+    dbp->set_errpfx(dbp, DATABASE);
 
-    /* Open the database. */
-    if ((ret = dbp->open(dbp, NULL, database, NULL,
+    /* Open the DATABASE. */
+    if ((ret = dbp->open(dbp, NULL, DATABASE, NULL,
         DB_UNKNOWN, DB_RDONLY, 0)) != 0) {
-        dbp->err(dbp, ret, "%s: DB->open", database);
+        dbp->err(dbp, ret, "%s: DB->open", DATABASE);
         goto err;
     }
 
-    /* Acquire a cursor for the database. */
+    /* Acquire a cursor for the DATABASE. */
     if ((ret = dbp->cursor(dbp, NULL, &dbcp, 0)) != 0) {
         dbp->err(dbp, ret, "DB->cursor");
         goto err;
@@ -159,7 +127,7 @@ int display(char* database)
     memset(&key, 0, sizeof(key));
     memset(&data, 0, sizeof(data));
 
-    /* Walk through the database and print out the key/data pairs. */
+    /* Walk through the DATABASE and print out the key/data pairs. */
     while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
         //int
         if (strncmp(key.data, "ty", key.size) == 0 ||
@@ -197,6 +165,6 @@ err:    if (close_dbc && (ret = dbcp->close(dbcp)) != 0)
 dbp->err(dbp, ret, "DBcursor->close");
 if (close_db && (ret = dbp->close(dbp, 0)) != 0)
 fprintf(stderr,
-    "%s: DB->close: %s\n", database, db_strerror(ret));
+    "%s: DB->close: %s\n", DATABASE, db_strerror(ret));
 return (0);
 }

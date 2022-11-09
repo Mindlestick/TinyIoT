@@ -3,49 +3,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <db.h>
-#include <ctype.h>
-#include <time.h>
-
 #include "onem2m.h"
 
 int main() {
-    
-    CNT cnt1,cnt2;
 
-    //input sample
-    cnt1.pi = "TAE1";
-    cnt1.ri = "3-20220513093154147745";
-    cnt1.ty = 3;
-    cnt1.ct = "202205T093154";
-    cnt1.st = 0;
-    cnt1.rn = "status1";
-    cnt1.lt = "20220513T093154";
-    cnt1.et = "20220513T093154";
-    cnt1.cni = 0;
-    cnt1.cbs = 0;
-    cnt1.lbl = "lbl1";
-    cnt1.acpi = "acpi1";
+    CNT cnt_after;
+    cnt_after.rn = "status1_updateeee";
+    cnt_after.ri = "3-20220513093154147745";
+    cnt_after.lbl = "lbl_update";
 
-
-    cnt2.pi = "TAE1";
-    cnt2.ri = "3-20210513093154147745";
-    cnt2.ty = 3;
-    cnt2.ct = "202105T093154";
-    cnt2.st = 0;
-    cnt2.rn = "status22222";
-    cnt2.lt = "20210513T093154";
-    cnt2.et = "20210513T093154";
-    cnt2.cni = 0;
-    cnt2.cbs = 0;
-    cnt2.lbl = "lbl2";
-    cnt2.acpi = "acpi2";
-
-    // [success -> 1] 
-    if(DB_Store_CNT(&cnt1)) fprintf(stderr, "store success!\n");
-    if(DB_Store_CNT(&cnt2)) fprintf(stderr, "store success!\n");
-
-    char* DATABASE = "RESOURCE.db";
-    DB_display(DATABASE);
+    int flag = DB_Update_CNT(&cnt_after);
+    if(flag==1)
+        display("RESOURCE.db");
 
     return 0;
 }
@@ -71,13 +40,13 @@ DB* DB_OPEN_(DB *dbp,char* DATABASE){
     if (ret) {
         dbp->err(dbp, ret, "%s", DATABASE);
         fprintf(stderr, "DB Open ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
 
 /*DB Get Cursor*/
-DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
+DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){     
     int ret;
     
     if ((ret = dbp->cursor(dbp, NULL, &dbcp, 0)) != 0) {
@@ -88,38 +57,39 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int DB_Store_CNT(CNT *cnt_object) {
-    char* DATABASE = "RESOURCE.db";
-
-    DB* dbp;    // db handle
+int DB_Update_CNT(CNT* cnt_object) {
+    char* DATABASE = "RESOURCE.db";   
+    DB* dbp;
     DBC* dbcp;
-    int ret;        // template value
+    DBT key_ri, data;
+    int ret;
 
-    DBT key_ri;
-    DBT data;  // storving key and real data
-    
-    // if input == NULL
-    if (cnt_object->ri == NULL) {
-        fprintf(stderr, "ri is NULL\n");
+    /* ri NULL ERROR*/
+    if(cnt_object->ri==NULL){
+        fprintf(stderr,"ri NULL ERROR\n");
         return -1;
     }
-    if (cnt_object->rn == NULL) cnt_object->rn = " ";
-    if (cnt_object->pi == NULL) cnt_object->pi = " ";
-    if (cnt_object->ty == '\0') cnt_object->ty = 0;
-    if (cnt_object->ct == NULL) cnt_object->ct = " ";
-    if (cnt_object->lt == NULL) cnt_object->lt = " ";
-    if (cnt_object->et == NULL) cnt_object->et = " ";
-    
-    if (cnt_object->lbl == NULL) cnt_object->lbl = " ";
-    if (cnt_object->acpi == NULL) cnt_object->acpi = " ";
-    if (cnt_object->cni == '\0') cnt_object->cni = 0;
-    if (cnt_object->cbs == '\0') cnt_object->cbs = 0;
-    if (cnt_object->st == '\0') cnt_object->st = 0;
+
+    //Struct to store in DB
+    CNT* cnt = calloc(1,sizeof(CNT));
+    cnt = DB_Get_CNT(cnt_object->ri);
+
+    if(cnt_object->rn!=NULL) strcpy(cnt->rn,cnt_object->rn);
+    if(cnt_object->pi!=NULL) strcpy(cnt->pi,cnt_object->pi);
+    if(cnt_object->ct!=NULL) strcpy(cnt->ct,cnt_object->ct);
+    if(cnt_object->lt!=NULL) strcpy(cnt->lt,cnt_object->lt);
+    if(cnt_object->et!=NULL) strcpy(cnt->et,cnt_object->et);
+    if(cnt_object->lbl!=NULL) strcpy(cnt->lbl,cnt_object->lbl);
+    if(cnt_object->acpi!=NULL) strcpy(cnt->acpi,cnt_object->acpi);    
+    if(cnt_object->ty!=0) cnt->ty=cnt_object->ty;
+    if(cnt_object->cbs!=0) cnt->ty=cnt_object->cbs;
+    if(cnt_object->cni!=0) cnt->ty=cnt_object->cni;       
+    if(cnt_object->st!=0) cnt->ty=cnt_object->st;
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
-    
+
     /* key and data must initialize */
     memset(&key_ri, 0, sizeof(DBT));
     memset(&data, 0, sizeof(DBT));
@@ -131,12 +101,12 @@ int DB_Store_CNT(CNT *cnt_object) {
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
     sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%d;%d;%d",
-            cnt_object->rn,cnt_object->pi,cnt_object->ty,cnt_object->ct,cnt_object->lt,cnt_object->et,
-            cnt_object->lbl,cnt_object->acpi,cnt_object->cbs,cnt_object->cni,cnt_object->st);
+            cnt->rn,cnt->pi,cnt->ty,cnt->ct,cnt->lt,
+            cnt->et,cnt->lbl,cnt->acpi,cnt->cbs,cnt->cni,cnt->st);
 
     data.data = str;
     data.size = strlen(str) + 1;
-
+    
     /* input DB */
     if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
         dbp->err(dbp, ret, "db->cursor");
@@ -148,7 +118,7 @@ int DB_Store_CNT(CNT *cnt_object) {
     return 1;
 }
 
-int DB_display(char* database)
+int display(char* database)
 {
     printf("[Display] %s \n", database); //DB name print
 
@@ -191,14 +161,16 @@ int DB_display(char* database)
 
     /* Walk through the database and print out the key/data pairs. */
     while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
+        //int
         if (strncmp(key.data, "ty", key.size) == 0 ||
             strncmp(key.data, "st", key.size) == 0 ||
             strncmp(key.data, "cni", key.size) == 0 ||
             strncmp(key.data, "cbs", key.size) == 0 ||
             strncmp(key.data, "cs", key.size) == 0
-            ){
+            ) {
             printf("%.*s : %d\n", (int)key.size, (char*)key.data, *(int*)data.data);
         }
+        //bool
         else if (strncmp(key.data, "rr", key.size) == 0) {
             printf("%.*s : ", (int)key.size, (char*)key.data);
             if (*(bool*)data.data == true)
@@ -207,6 +179,7 @@ int DB_display(char* database)
                 printf("false\n");
         }
 
+        //string
         else {
             printf("%.*s : %.*s\n",
                 (int)key.size, (char*)key.data,

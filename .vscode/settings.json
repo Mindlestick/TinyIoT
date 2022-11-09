@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "db.h": "c"
+        "db.h": "c",
+        "types.h": "c",
+        "onem2m.h": "c"
     }
 }
