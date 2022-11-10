@@ -6,12 +6,21 @@
 #include "onem2m.h"
 
 int main() {
+    /*
     Node* acp = DB_Get_All_ACP();
     while (acp) {
         fprintf(stderr, "%s\n", acp->rn);
         acp = acp->siblingRight;
     }
-    return 0;
+    */
+
+    AE ae_after;
+    ae_after.rn = "Sensor2_updateeee";
+    ae_after.ri = "2-20191210093452845";
+    ae_after.api = "tinyProject2_update";
+
+    if(DB_Update_AE(&ae_after))
+        DB_display("RESOURCE.db");
 }
 
 /*DB CREATE*/
@@ -1115,8 +1124,6 @@ int DB_Update_AE(AE* ae_object) {
 
     if(ae_object->ty!=0) ae->ty=ae_object->ty;
    
-
-
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
@@ -1145,6 +1152,7 @@ int DB_Update_AE(AE* ae_object) {
     /* DB close */
     dbcp->close(dbcp);
     dbp->close(dbp, 0); 
+    free(ae);
 
     return 1;
 }
@@ -1205,7 +1213,8 @@ int DB_Update_CNT(CNT* cnt_object) {
 
     /* DB close */
     dbcp->close(dbcp);
-    dbp->close(dbp, 0); 
+    dbp->close(dbp, 0);
+    free(cnt);
 
     return 1;
 }
@@ -1265,7 +1274,8 @@ int DB_Update_ACP(ACP* acp_object) {
 
     /* DB close */
     dbcp->close(dbcp);
-    dbp->close(dbp, 0); 
+    dbp->close(dbp, 0);
+    free(acp);
 
     return 1;
 }
@@ -1407,6 +1417,9 @@ Node* DB_Get_All_AE() {
     }
 
     node->siblingLeft->siblingRight = NULL;
+    free(node->ri);
+    free(node->rn);
+    free(node->pi);    
     free(node);
     node = NULL;
 
@@ -1478,6 +1491,9 @@ Node* DB_Get_All_CNT() {
     }
 
     node->siblingLeft->siblingRight = NULL;
+    free(node->ri);
+    free(node->rn);
+    free(node->pi);
     free(node);
     node = NULL;
 
@@ -1549,6 +1565,9 @@ Node* DB_Get_All_CSE() {
     }
 
     node->siblingLeft->siblingRight = NULL;
+    free(node->ri);
+    free(node->rn);
+    free(node->pi);
     free(node);
     node = NULL;
 
@@ -1620,6 +1639,9 @@ Node* DB_Get_All_ACP() {
     }
 
     node->siblingLeft->siblingRight = NULL;
+    free(node->ri);
+    free(node->rn);
+    free(node->pi);
     free(node);
     node = NULL;
 
