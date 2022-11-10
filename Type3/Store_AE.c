@@ -10,13 +10,13 @@
 
 int main() {
     
-    AE ae1,ae2;
+    AE ae1,ae2,ae3;
 
     //input sample
     ae1.rn = "Sensor1";
     ae1.ty = 2;
     ae1.pi = "5-20191210093452845";
-    ae1.ri = "TAE1";
+    ae1.ri = "2-20191210093452845";
     ae1.ct = "20220513T083900";
     ae1.lt = "20220513T083900";
     ae1.et = "20240513T083900";
@@ -27,7 +27,7 @@ int main() {
     ae2.rn = "Sensor2";
     ae2.ty = 2;
     ae2.pi = "5-20191210093452845";
-    ae2.ri = "TAE2";
+    ae2.ri = "2-20201210093452845";
     ae2.ct = "20220513T083900";
     ae2.lt = "20220513T083900";
     ae2.et = "20240513T083900";
@@ -35,9 +35,21 @@ int main() {
     ae2.rr = true;
     ae2.aei = "TAE2";
 
+    ae3.rn = "Sensor3";
+    ae3.ty = 2;
+    ae3.pi = "5-20191210093452845";
+    ae3.ri = "2-20211210093452845";
+    ae3.ct = "20220513T083900";
+    ae3.lt = "20220513T083900";
+    ae3.et = "20240513T083900";
+    ae3.api = "tinyProject3";
+    ae3.rr = true;
+    ae3.aei = "TAE3";
+
     // [success -> 1] 
     if(DB_Store_AE(&ae1)) fprintf(stderr, "store success!\n");
     if(DB_Store_AE(&ae2)) fprintf(stderr, "store success!\n");
+    if(DB_Store_AE(&ae3)) fprintf(stderr, "store success!\n");
 
     char* DATABASE = "RESOURCE.db";
     DB_display(DATABASE);

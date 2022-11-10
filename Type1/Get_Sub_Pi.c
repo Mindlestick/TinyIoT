@@ -166,10 +166,8 @@ Node* Get_Sub_Pi(char* pi) {
     return head;
 }
 
-int display(char* database)
+int DB_display(char* database)
 {
-    printf("[Display] %s \n", database); //DB name print
-
     DB* dbp;
     DBC* dbcp;
     DBT key, data;

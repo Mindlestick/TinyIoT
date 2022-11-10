@@ -186,11 +186,11 @@ int DB_Delete(char* ri);
 int DB_Delete_SUB(char* ri);
 int DB_Delete_ACP(char* ri);
 
-Node* Get_All_CSE();
-Node* Get_All_AE();
-Node* Get_All_CNT();
-Node* Get_All_CIN();
-Node* Get_All_Sub();
+Node* DB_Get_All_CSE();
+Node* DB_Get_All_AE();
+Node* DB_Get_All_CNT();
+Node* DB_Get_All_Sub();
+Node* DB_Get_All_ACP();
 
 char* Get_LocalTime();
 Node* Get_CIN_Period(char* start_time, char* end_time);

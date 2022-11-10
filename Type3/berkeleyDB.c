@@ -6,14 +6,11 @@
 #include "onem2m.h"
 
 int main() {
-
-    ACP acp_after;
-    acp_after.rn = "acp_updateeee";
-    acp_after.ri = "1-20191210093452845";
-
-    int flag = DB_Update_ACP(&acp_after);
-    if(flag==1)
-        DB_display("ACP.db");
+    Node* ae = DB_Get_All_AE();
+    while (ae) {
+        fprintf(stderr, "%s\n", ae->ri);
+        ae = ae->siblingRight;
+    }
 
     return 0;
 }
@@ -1214,6 +1211,66 @@ int DB_Update_CNT(CNT* cnt_object) {
     return 1;
 }
 
+int DB_Update_ACP(ACP* acp_object) {
+    char* DATABASE = "ACP.db";    
+    DB* dbp;
+    DBC* dbcp;
+    DBT key_ri, data;
+    int ret;
+
+    /* ri NULL ERROR*/
+    if(acp_object->ri==NULL){
+        fprintf(stderr,"ri NULL ERROR\n");
+        return -1;
+    }
+
+    //Struct to store in DB
+    ACP* acp = calloc(1,sizeof(ACP));
+    acp = DB_Get_ACP(acp_object->ri);
+
+    if(acp_object->rn!=NULL) strcpy(acp->rn,acp_object->rn);
+    if(acp_object->pi!=NULL) strcpy(acp->pi,acp_object->pi);
+    if(acp_object->ct!=NULL) strcpy(acp->ct,acp_object->ct);
+    if(acp_object->lt!=NULL) strcpy(acp->lt,acp_object->lt);
+    if(acp_object->et!=NULL) strcpy(acp->et,acp_object->et);
+    if(acp_object->pv_acor!=NULL) strcpy(acp->pv_acor,acp_object->pv_acor);
+    if(acp_object->pv_acop!=NULL) strcpy(acp->pv_acop,acp_object->pv_acop);
+    if(acp_object->pvs_acor!=NULL) strcpy(acp->pvs_acor,acp_object->pvs_acor);       
+    if(acp_object->pvs_acop!=NULL) strcpy(acp->pvs_acop,acp_object->pvs_acop);    
+    if(acp_object->ty!=0) acp->ty=acp_object->ty;
+   
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+
+    /* key and data must initialize */
+    memset(&key_ri, 0, sizeof(DBT));
+    memset(&data, 0, sizeof(DBT));
+
+    /* initialize the data to be the first of two duplicate records. */
+    key_ri.data = acp_object->ri;
+    key_ri.size = strlen(acp_object->ri) + 1;
+
+    /* List data excluding 'ri' as strings using delimiters. */
+    char str[DB_STR_MAX]= "\0";
+    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%s;%s",
+            acp->rn,acp->pi,acp->ty,acp->ct,acp->lt,
+            acp->et,acp->pv_acor,acp->pv_acop,acp->pvs_acor,acp->pvs_acop);
+
+    data.data = str;
+    data.size = strlen(str) + 1;
+    
+    /* input DB */
+    if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
+        dbp->err(dbp, ret, "db->cursor");
+
+    /* DB close */
+    dbcp->close(dbcp);
+    dbp->close(dbp, 0); 
+
+    return 1;
+}
+
 int DB_Delete(char* ri) {
     char* DATABASE = "RESOURCE.db";
     DB* dbp;
@@ -1290,65 +1347,95 @@ int DB_Delete_ACP(char* ri) {
     return 1;
 }
 
-int DB_Update_ACP(ACP* acp_object) {
-    char* DATABASE = "ACP.db";    
+
+
+
+
+
+
+
+
+
+Node* DB_Get_All_AE() {
+    char* DATABASE = "RESOURCE.db";
+    char* TYPE = "2-";
+
     DB* dbp;
     DBC* dbcp;
-    DBT key_ri, data;
+    DBT key, data;
     int ret;
 
-    /* ri NULL ERROR*/
-    if(acp_object->ri==NULL){
-        fprintf(stderr,"ri NULL ERROR\n");
-        return -1;
-    }
-
-    //Struct to store in DB
-    ACP* acp = calloc(1,sizeof(ACP));
-    acp = DB_Get_ACP(acp_object->ri);
-
-    if(acp_object->rn!=NULL) strcpy(acp->rn,acp_object->rn);
-    if(acp_object->pi!=NULL) strcpy(acp->pi,acp_object->pi);
-    if(acp_object->ct!=NULL) strcpy(acp->ct,acp_object->ct);
-    if(acp_object->lt!=NULL) strcpy(acp->lt,acp_object->lt);
-    if(acp_object->et!=NULL) strcpy(acp->et,acp_object->et);
-    if(acp_object->pv_acor!=NULL) strcpy(acp->pv_acor,acp_object->pv_acor);
-    if(acp_object->pv_acop!=NULL) strcpy(acp->pv_acop,acp_object->pv_acop);
-    if(acp_object->pvs_acor!=NULL) strcpy(acp->pvs_acor,acp_object->pvs_acor);       
-    if(acp_object->pvs_acop!=NULL) strcpy(acp->pvs_acop,acp_object->pvs_acop);    
-    if(acp_object->ty!=0) acp->ty=acp_object->ty;
-   
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
 
-    /* key and data must initialize */
-    memset(&key_ri, 0, sizeof(DBT));
-    memset(&data, 0, sizeof(DBT));
+    /* Initialize the key/data return pair. */
+    memset(&key, 0, sizeof(key));
+    memset(&data, 0, sizeof(data));
 
-    /* initialize the data to be the first of two duplicate records. */
-    key_ri.data = acp_object->ri;
-    key_ri.size = strlen(acp_object->ri) + 1;
+    int cnt = 0;
+    DBC* dbcp0;
+    dbcp0 = DB_GET_CURSOR(dbp,dbcp0);
+    while ((ret = dbcp0->get(dbcp0, &key, &data, DB_NEXT)) == 0) {
+        if (strncmp(key.data, TYPE , 2) == 0) 
+            cnt++;
+    }
+    //fprintf(stderr, "<%d>\n",cnt);
 
-    /* List data excluding 'ri' as strings using delimiters. */
-    char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%s;%s",
-            acp->rn,acp->pi,acp->ty,acp->ct,acp->lt,
-            acp->et,acp->pv_acor,acp->pv_acop,acp->pvs_acor,acp->pvs_acop);
+    if (cnt == 0) {
+        fprintf(stderr, "Data not exist\n");
+        return NULL;
+    }
 
-    data.data = str;
-    data.size = strlen(str) + 1;
-    
-    /* input DB */
-    if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
-        dbp->err(dbp, ret, "db->cursor");
+    Node* head = calloc(cnt,sizeof(Node));
+    Node* node;
+    node = head;
 
-    /* DB close */
-    dbcp->close(dbcp);
-    dbp->close(dbp, 0); 
+    while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
+        if (strncmp(key.data, TYPE , 2) == 0){
+            AE* ae = DB_Get_AE((char*)key.data);
+            node->ri = calloc(strlen(ae->ri)+1,sizeof(char));
+            node->rn = calloc(strlen(ae->rn)+1,sizeof(char));
+            node->pi = calloc(strlen(ae->pi)+1,sizeof(char));
+            //node->ty = calloc(sizeof(ae->ty),sizeof(int));
 
-    return 1;
+            strcpy(node->ri,ae->ri);
+            strcpy(node->rn,ae->rn);
+            strcpy(node->pi,ae->pi);
+            node->ty = ae->ty;
+
+            node->siblingRight=(Node*)calloc(1,sizeof(Node));
+            //node->siblingRight=calloc(1,sizeof(Node));            
+            node->siblingRight->siblingLeft = node;
+            node = node->siblingRight;
+        }
+    }
+    if (ret != DB_NOTFOUND) {
+        dbp->err(dbp, ret, "DBcursor->get");
+        fprintf(stderr, "Cursor ERROR\n");
+        return NULL;
+    }
+
+    node->siblingLeft->siblingRight = NULL;
+    free(node);
+    node = NULL;
+
+    /* Cursors must be closed */
+    if (dbcp != NULL)
+        dbcp->close(dbcp);
+    if (dbp != NULL)
+        dbp->close(dbp, 0);    
+
+    return head;
 }
+
+
+
+
+
+
+
+
 
 /*
  Function name: Store_Label
