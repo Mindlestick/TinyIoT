@@ -1356,6 +1356,81 @@ int DB_Delete_ACP(char* ri) {
     return 1;
 }
 
+Node* DB_Get_All_CSE() {
+    char* DATABASE = "RESOURCE.db";
+    char* TYPE = "5-";
+
+    DB* dbp;
+    DBC* dbcp;
+    DBT key, data;
+    int ret;
+
+    dbp = DB_CREATE_(dbp);
+    dbp = DB_OPEN_(dbp,DATABASE);
+    dbcp = DB_GET_CURSOR(dbp,dbcp);
+
+    /* Initialize the key/data return pair. */
+    memset(&key, 0, sizeof(key));
+    memset(&data, 0, sizeof(data));
+
+    int cse = 0;
+    DBC* dbcp0;
+    dbcp0 = DB_GET_CURSOR(dbp,dbcp0);
+    while ((ret = dbcp0->get(dbcp0, &key, &data, DB_NEXT)) == 0) {
+        if (strncmp(key.data, TYPE , 2) == 0) 
+            cse++;
+    }
+    //fprintf(stderr, "<%d>\n",cse);
+
+    if (cse == 0) {
+        fprintf(stderr, "Data not exist\n");
+        return NULL;
+    }
+
+    Node* head = calloc(cse,sizeof(Node));
+    Node* node;
+    node = head;
+
+    while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
+        if (strncmp(key.data, TYPE , 2) == 0){
+            CSE* cse = DB_Get_CSE((char*)key.data);
+            node->ri = calloc(strlen(cse->ri)+1,sizeof(char));
+            node->rn = calloc(strlen(cse->rn)+1,sizeof(char));
+            node->pi = calloc(strlen(cse->pi)+1,sizeof(char));
+
+            strcpy(node->ri,cse->ri);
+            strcpy(node->rn,cse->rn);
+            strcpy(node->pi,cse->pi);
+            node->ty = cse->ty;
+
+            node->siblingRight=calloc(1,sizeof(Node));            
+            node->siblingRight->siblingLeft = node;
+            node = node->siblingRight;
+            free(cse);
+        }
+    }
+    if (ret != DB_NOTFOUND) {
+        dbp->err(dbp, ret, "DBcursor->get");
+        fprintf(stderr, "Cursor ERROR\n");
+        return NULL;
+    }
+
+    node->siblingLeft->siblingRight = NULL;
+    free(node->ri);
+    free(node->rn);
+    free(node->pi);
+    free(node);
+    node = NULL;
+
+    /* Cursors must be closed */
+    if (dbcp != NULL)
+        dbcp->close(dbcp);
+    if (dbp != NULL)
+        dbp->close(dbp, 0);    
+
+    return head;
+}
+
 Node* DB_Get_All_AE() {
     char* DATABASE = "RESOURCE.db";
     char* TYPE = "2-";
@@ -1408,6 +1483,7 @@ Node* DB_Get_All_AE() {
             //node->siblingRight=calloc(1,sizeof(Node));            
             node->siblingRight->siblingLeft = node;
             node = node->siblingRight;
+            free(ae);
         }
     }
     if (ret != DB_NOTFOUND) {
@@ -1482,80 +1558,7 @@ Node* DB_Get_All_CNT() {
             node->siblingRight=calloc(1,sizeof(Node));            
             node->siblingRight->siblingLeft = node;
             node = node->siblingRight;
-        }
-    }
-    if (ret != DB_NOTFOUND) {
-        dbp->err(dbp, ret, "DBcursor->get");
-        fprintf(stderr, "Cursor ERROR\n");
-        return NULL;
-    }
-
-    node->siblingLeft->siblingRight = NULL;
-    free(node->ri);
-    free(node->rn);
-    free(node->pi);
-    free(node);
-    node = NULL;
-
-    /* Cursors must be closed */
-    if (dbcp != NULL)
-        dbcp->close(dbcp);
-    if (dbp != NULL)
-        dbp->close(dbp, 0);    
-
-    return head;
-}
-
-Node* DB_Get_All_CSE() {
-    char* DATABASE = "RESOURCE.db";
-    char* TYPE = "5-";
-
-    DB* dbp;
-    DBC* dbcp;
-    DBT key, data;
-    int ret;
-
-    dbp = DB_CREATE_(dbp);
-    dbp = DB_OPEN_(dbp,DATABASE);
-    dbcp = DB_GET_CURSOR(dbp,dbcp);
-
-    /* Initialize the key/data return pair. */
-    memset(&key, 0, sizeof(key));
-    memset(&data, 0, sizeof(data));
-
-    int cse = 0;
-    DBC* dbcp0;
-    dbcp0 = DB_GET_CURSOR(dbp,dbcp0);
-    while ((ret = dbcp0->get(dbcp0, &key, &data, DB_NEXT)) == 0) {
-        if (strncmp(key.data, TYPE , 2) == 0) 
-            cse++;
-    }
-    //fprintf(stderr, "<%d>\n",cse);
-
-    if (cse == 0) {
-        fprintf(stderr, "Data not exist\n");
-        return NULL;
-    }
-
-    Node* head = calloc(cse,sizeof(Node));
-    Node* node;
-    node = head;
-
-    while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
-        if (strncmp(key.data, TYPE , 2) == 0){
-            CSE* cse = DB_Get_CSE((char*)key.data);
-            node->ri = calloc(strlen(cse->ri)+1,sizeof(char));
-            node->rn = calloc(strlen(cse->rn)+1,sizeof(char));
-            node->pi = calloc(strlen(cse->pi)+1,sizeof(char));
-
-            strcpy(node->ri,cse->ri);
-            strcpy(node->rn,cse->rn);
-            strcpy(node->pi,cse->pi);
-            node->ty = cse->ty;
-
-            node->siblingRight=calloc(1,sizeof(Node));            
-            node->siblingRight->siblingLeft = node;
-            node = node->siblingRight;
+            free(cnt);
         }
     }
     if (ret != DB_NOTFOUND) {
@@ -1630,6 +1633,7 @@ Node* DB_Get_All_ACP() {
             node->siblingRight=calloc(1,sizeof(Node));            
             node->siblingRight->siblingLeft = node;
             node = node->siblingRight;
+            free(acp);
         }
     }
     if (ret != DB_NOTFOUND) {
