@@ -16,7 +16,7 @@ int main() {
     cse.rn = "cse1";
     cse.ri = "5-20191210093452845";
     cse.pi = "NUL";
-    //cse.ty = 5;
+    cse.ty = 5;
     cse.ct = "20191210T093452";
     cse.lt = "20191210T093452";
     cse.csi = "/Tiny Project1";

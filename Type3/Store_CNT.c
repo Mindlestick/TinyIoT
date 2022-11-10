@@ -13,7 +13,7 @@ int main() {
     CNT cnt1,cnt2;
 
     //input sample
-    cnt1.pi = "TAE1";
+    cnt1.pi = "2-20211210093452845";
     cnt1.ri = "3-20220513093154147745";
     cnt1.ty = 3;
     cnt1.ct = "202205T093154";
@@ -27,7 +27,7 @@ int main() {
     cnt1.acpi = "acpi1";
 
 
-    cnt2.pi = "TAE1";
+    cnt2.pi = "2-20211210093452845";
     cnt2.ri = "3-20210513093154147745";
     cnt2.ty = 3;
     cnt2.ct = "202105T093154";

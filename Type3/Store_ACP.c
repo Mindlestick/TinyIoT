@@ -81,12 +81,12 @@ int main() {
 
 */
     
-    ACP acp;
+    ACP acp,acp1;
 
     //input sample
-    acp.rn = "acp2";
+    acp.rn = "acp1";
     acp.ri = "1-20191210093452845";
-    acp.pi = "pi_pi";
+    acp.pi = "pi1";
     acp.ty = 1;
     acp.ct = "20191210T093452";
     acp.lt = "20191210T093452";
@@ -96,8 +96,21 @@ int main() {
     acp.pvs_acor = "SM";
     acp.pvs_acop = "63";
 
+    acp1.rn = "acp2";
+    acp1.ri = "1-20201210093452845";
+    acp1.pi = "pi2";
+    acp1.ty = 1;
+    acp1.ct = "20191210T093452";
+    acp1.lt = "20191210T093452";
+    acp1.et = "20211210T093452";
+    acp1.pv_acor = "CAE2";
+    acp1.pv_acop = "2";
+    acp1.pvs_acor = "SM";
+    acp1.pvs_acop = "63";
+
     // [success -> 1] 
     if(DB_Store_ACP(&acp)) fprintf(stderr, "store success!\n");
+    if(DB_Store_ACP(&acp1)) fprintf(stderr, "store success!\n");    
 
     // print
     char* DATABASE = "ACP.db";
