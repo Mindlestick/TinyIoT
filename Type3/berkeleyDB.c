@@ -5,21 +5,6 @@
 #include <time.h>
 #include "onem2m.h"
 
-int main() {
-
-    Node* cin = DB_Get_CIN_Pi("3-20220513091700249586");
-    if (cin == NULL) printf("test NULL\n");
-    else {
-        while (cin) {
-            fprintf(stderr, "[%s %s %s %d]\n", cin->rn, cin->ri, cin->pi, cin->ty);
-            cin = cin->siblingRight;
-        }
-    }
-    DB_display("RESOURCE.db");
-
-    return 0;
-}
-
 /*DB CREATE*/
 DB* DB_CREATE_(DB *dbp){
     int ret;
