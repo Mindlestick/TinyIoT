@@ -28,8 +28,8 @@ int main() {
     return 0;
 }
 
-Node* Get_Sub_Pi(char* pi) {
-    char* database = "SUB.db";
+Node* Get_Sub_Pi(char* pi){
+    char* database = "sub.db";
 
     DB* dbp;
     DBC* dbcp;
@@ -61,7 +61,7 @@ Node* Get_Sub_Pi(char* pi) {
 
     int cnt = 0;
     int idx = 0;
-    int* arr = NULL;
+    int cnt_sub = 0;
 
     // ������Ʈ�� ����� ã�� ���� Ŀ��
     DBC* dbcp0;
@@ -70,7 +70,7 @@ Node* Get_Sub_Pi(char* pi) {
         exit(1);
     }
     while ((ret = dbcp0->get(dbcp0, &key, &data, DB_NEXT)) == 0) {
-        if (strncmp(key.data, "pi", key.size) == 0 && strncmp(data.data, pi, data.size) == 0) {
+        if (strncmp(key.data, pi, key.size) == 0) {
             cnt++; // ��ü ����
         }
     }
@@ -80,83 +80,75 @@ Node* Get_Sub_Pi(char* pi) {
         exit(1);
     }
 
-    //������Ʈ ������ŭ �����Ҵ�
-    arr = (int*)malloc(sizeof(int) * cnt);
-    for (int i = 0; i < cnt; i++) arr[i] = 0;
-    
-    // �ش��ϴ� ������Ʈ�� ����� ã�� ���� Ŀ��
-    DBC* dbcp1;
-    if ((ret = dbp->cursor(dbp, NULL, &dbcp1, 0)) != 0) {
-        dbp->err(dbp, ret, "DB->cursor");
-        exit(1);
-    }
-    // �ش��ϴ� ������Ʈ �迭�� 1�� ǥ��
-    while ((ret = dbcp1->get(dbcp1, &key, &data, DB_NEXT)) == 0) {
-        if (strncmp(key.data, "pi", key.size) == 0) {
-            if (strncmp(data.data, pi, data.size) == 0 )
-                arr[idx] = 1;
-            idx++;
-        }
-    }
+    //������Ʈ ���� ����
+    int struct_size = 10;
+    cnt = cnt / struct_size;
+    char* tmp;
+
 
     Node* head = (Node*)calloc(cnt, sizeof(Node));
-    Node* node_net;
-    Node* node_nu;
-    Node* node_pi;
-    Node* node_ri;
-    Node* node_rn;
-
-    node_rn = node_ri = node_nu = node_net = node_pi = head;
+    Node* node;
+    node = head;
+    //node_ri = node_pi = node_rn = node_nu = node_sub_bit = head;
     
-
     while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
-        if (strncmp(key.data, "net", key.size) == 0) {
-            if (arr[idx % cnt]) {
-                node_net->net = malloc(data.size);
-                strcpy(node_net->net, data.data);
-                node_net->siblingRight = (Node*)malloc(sizeof(Node));
-                node_net->siblingRight->siblingLeft = node_net;
-                node_net = node_net->siblingRight;
+        if (strncmp(key.data, pi, key.size) == 0) {
+            switch (idx) {
+            case 0:
+                node->ri = malloc(data.size);
+                strcpy(node->ri, data.data);
+
+                node->siblingRight = (Node*)malloc(sizeof(Node));
+                node->siblingRight->siblingLeft = node;
+
+                idx++;
+                break;
+            case 1:
+                node->rn = malloc(data.size);
+                strcpy(node->rn, data.data);
+
+                idx++;
+                break;
+            case 2:
+                node->nu = malloc(data.size);
+                strcpy(node->nu, data.data);
+
+                idx++;
+                break;
+            case 3:
+                //tmp = malloc(data.size);
+                //strcpy(tmp, data.data);
+                node->net = NetToBit(data.data);
+
+                //node->net = malloc(data.size);
+                //strcpy(node->net, data.data);
+
+                idx++;
+                break;
+            case 4:
+                node->sur = malloc(data.size);
+                strcpy(node->sur, data.data);
+
+                idx++;
+                break;
+            case 5:
+                node->pi = malloc(key.size);
+                strcpy(node->pi, key.data);
+
+                node = node->siblingRight;
+                idx++;
+                break;
+            default:
+                idx++;
+                if (idx == struct_size) idx = 0;
             }
-            idx++;
-        }
-        if (strncmp(key.data, "nu", key.size) == 0) {
-            if (arr[idx % cnt]) {
-                node_nu->nu = malloc(data.size);
-                strcpy(node_nu->nu, data.data);
-                node_nu = node_nu->siblingRight;
-            }
-            idx++;
-        }
-        if (strncmp(key.data, "pi", key.size) == 0) {
-            if (arr[idx % cnt]) {
-                node_pi->pi = malloc(data.size);
-                strcpy(node_pi->pi, data.data);
-                node_pi = node_pi->siblingRight;
-            }
-            idx++;
-        }
-        if (strncmp(key.data, "ri", key.size) == 0) {
-            if (arr[idx % cnt]) {
-                node_ri->ri = malloc(data.size);
-                strcpy(node_ri->ri, data.data);
-                node_ri = node_ri->siblingRight;
-            }
-            idx++;
-        }
-        if (strncmp(key.data, "rn", key.size) == 0) {
-            if (arr[idx % cnt]) {
-                node_rn->rn = malloc(data.size);
-                strcpy(node_rn->rn, data.data);
-                node_rn = node_rn->siblingRight;
-            }
-            idx++;
+            
         }
     }
 
-    node_pi->siblingLeft->siblingRight = NULL;
-    free(node_pi);
-    node_ri = node_pi = node_rn = node_nu = node_net = NULL;
+    node->siblingLeft->siblingRight = NULL;
+    free(node);
+    node = NULL;
 
     /* DB close */
     dbcp->close(dbcp0);

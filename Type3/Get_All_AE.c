@@ -130,6 +130,7 @@ Node* DB_Get_All_AE() {
             node->siblingRight=calloc(1,sizeof(Node));            
             node->siblingRight->siblingLeft = node;
             node = node->siblingRight;
+            free(ae);
         }
     }
     if (ret != DB_NOTFOUND) {

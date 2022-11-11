@@ -91,19 +91,20 @@ Node* DB_Get_All_CNT() {
 
     while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
         if (strncmp(key.data, TYPE , 2) == 0){
-            CNT* cnt = DB_Get_CNT((char*)key.data);
-            node->ri = calloc(strlen(cnt->ri)+1,sizeof(char));
-            node->rn = calloc(strlen(cnt->rn)+1,sizeof(char));
-            node->pi = calloc(strlen(cnt->pi)+1,sizeof(char));
+            CNT* CNT = DB_Get_CNT((char*)key.data);
+            node->ri = calloc(strlen(CNT->ri)+1,sizeof(char));
+            node->rn = calloc(strlen(CNT->rn)+1,sizeof(char));
+            node->pi = calloc(strlen(CNT->pi)+1,sizeof(char));
 
-            strcpy(node->ri,cnt->ri);
-            strcpy(node->rn,cnt->rn);
-            strcpy(node->pi,cnt->pi);
-            node->ty = cnt->ty;
+            strcpy(node->ri,CNT->ri);
+            strcpy(node->rn,CNT->rn);
+            strcpy(node->pi,CNT->pi);
+            node->ty = CNT->ty;
 
             node->siblingRight=calloc(1,sizeof(Node));            
             node->siblingRight->siblingLeft = node;
             node = node->siblingRight;
+            free(CNT);
         }
     }
     if (ret != DB_NOTFOUND) {
@@ -114,6 +115,9 @@ Node* DB_Get_All_CNT() {
 
     node->siblingLeft->siblingRight = NULL;
     free(node);
+    free(node->ri);
+    free(node->pi);
+    free(node->rn);  
     node = NULL;
 
     /* Cursors must be closed */

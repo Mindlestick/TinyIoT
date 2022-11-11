@@ -104,6 +104,7 @@ Node* DB_Get_All_CSE() {
             node->siblingRight=calloc(1,sizeof(Node));            
             node->siblingRight->siblingLeft = node;
             node = node->siblingRight;
+            free(cse);
         }
     }
     if (ret != DB_NOTFOUND) {

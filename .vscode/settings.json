@@ -2,6 +2,7 @@
     "files.associations": {
         "db.h": "c",
         "types.h": "c",
-        "onem2m.h": "c"
+        "onem2m.h": "c",
+        "stdio.h": "c"
     }
 }

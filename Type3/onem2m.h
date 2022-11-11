@@ -192,11 +192,11 @@ Node* DB_Get_All_CNT();
 Node* DB_Get_All_Sub();
 Node* DB_Get_All_ACP();
 
+Node* DB_Get_CIN_Pi(char* pi);
+
 char* Get_LocalTime();
 Node* Get_CIN_Period(char* start_time, char* end_time);
 
-Node* Get_CIN_Pi(char* pi);
-Node* Get_Sub_Pi(char* pi);
 
 
 
