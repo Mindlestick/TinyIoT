@@ -10,6 +10,7 @@ int main() {
     AE ae_after;
     ae_after.rn = "Sensor2_updateeee";
     ae_after.ri = "TAE2";
+    ae_after.rr = true; 
     ae_after.api = "tinyProject2_update";
 
     int flag = DB_Update_AE(&ae_after);
@@ -82,16 +83,12 @@ int DB_Update_AE(AE* ae_object) {
     if(ae_object->et!=NULL) strcpy(ae->et,ae_object->et);
     if(ae_object->api!=NULL) strcpy(ae->api,ae_object->api);
     if(ae_object->aei!=NULL) strcpy(ae->aei,ae_object->aei);
-
-    if(ae_object->rr == '\0'){
-        if (ae->rr==true) strcpy(rr,"true");
-        else strcpy(rr,"false");
+    if(ae_object->rr != ae->rr){
+        if(ae_object->rr == false) strcpy(rr,"false");
+        else strcpy(rr,"true");
     }
-
     if(ae_object->ty!=0) ae->ty=ae_object->ty;
    
-
-
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp,DATABASE);
     dbcp = DB_GET_CURSOR(dbp,dbcp);
@@ -120,89 +117,7 @@ int DB_Update_AE(AE* ae_object) {
     /* DB close */
     dbcp->close(dbcp);
     dbp->close(dbp, 0); 
+    free(ae);
 
     return 1;
-}
-
-int display(char* database)
-{
-    printf("[Display] %s \n", database); //DB name print
-
-    DB* dbp;
-    DBC* dbcp;
-    DBT key, data;
-    int close_db, close_dbc, ret;
-
-    close_db = close_dbc = 0;
-
-    /* Open the database. */
-    if ((ret = db_create(&dbp, NULL, 0)) != 0) {
-        fprintf(stderr,
-            "%s: db_create: %s\n", database, db_strerror(ret));
-        return (1);
-    }
-    close_db = 1;
-
-    /* Turn on additional error output. */
-    dbp->set_errfile(dbp, stderr);
-    dbp->set_errpfx(dbp, database);
-
-    /* Open the database. */
-    if ((ret = dbp->open(dbp, NULL, database, NULL,
-        DB_UNKNOWN, DB_RDONLY, 0)) != 0) {
-        dbp->err(dbp, ret, "%s: DB->open", database);
-        goto err;
-    }
-
-    /* Acquire a cursor for the database. */
-    if ((ret = dbp->cursor(dbp, NULL, &dbcp, 0)) != 0) {
-        dbp->err(dbp, ret, "DB->cursor");
-        goto err;
-    }
-    close_dbc = 1;
-
-    /* Initialize the key/data return pair. */
-    memset(&key, 0, sizeof(key));
-    memset(&data, 0, sizeof(data));
-
-    /* Walk through the database and print out the key/data pairs. */
-    while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
-        //int
-        if (strncmp(key.data, "ty", key.size) == 0 ||
-            strncmp(key.data, "st", key.size) == 0 ||
-            strncmp(key.data, "cni", key.size) == 0 ||
-            strncmp(key.data, "cbs", key.size) == 0 ||
-            strncmp(key.data, "cs", key.size) == 0
-            ) {
-            printf("%.*s : %d\n", (int)key.size, (char*)key.data, *(int*)data.data);
-        }
-        //bool
-        else if (strncmp(key.data, "rr", key.size) == 0) {
-            printf("%.*s : ", (int)key.size, (char*)key.data);
-            if (*(bool*)data.data == true)
-                printf("true\n");
-            else
-                printf("false\n");
-        }
-
-        //string
-        else {
-            printf("%.*s : %.*s\n",
-                (int)key.size, (char*)key.data,
-                (int)data.size, (char*)data.data);
-        }
-    }
-    if (ret != DB_NOTFOUND) {
-        dbp->err(dbp, ret, "DBcursor->get");
-        printf("Cursor ERROR\n");
-        exit(0);
-    }
-
-
-err:    if (close_dbc && (ret = dbcp->close(dbcp)) != 0)
-dbp->err(dbp, ret, "DBcursor->close");
-if (close_db && (ret = dbp->close(dbp, 0)) != 0)
-fprintf(stderr,
-    "%s: DB->close: %s\n", database, db_strerror(ret));
-return (0);
 }

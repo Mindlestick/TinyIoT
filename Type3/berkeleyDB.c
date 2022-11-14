@@ -5,6 +5,21 @@
 #include <time.h>
 #include "onem2m.h"
 
+
+int main(){
+    AE ae_after;
+    ae_after.rn = "Sensor2_updatee";
+    ae_after.ri = "2-20191210093452845";
+    ae_after.rr = true;
+    ae_after.api = "tinyProject2_update";
+
+    int flag = DB_Update_AE(&ae_after);
+    if(flag==1)
+        DB_display("RESOURCE.db");
+
+    return 0;
+}
+
 /*DB CREATE*/
 DB* DB_CREATE_(DB *dbp){
     int ret;
@@ -1090,12 +1105,10 @@ int DB_Update_AE(AE* ae_object) {
     if(ae_object->et!=NULL) strcpy(ae->et,ae_object->et);
     if(ae_object->api!=NULL) strcpy(ae->api,ae_object->api);
     if(ae_object->aei!=NULL) strcpy(ae->aei,ae_object->aei);
-
-    if(ae_object->rr == '\0'){
-        if (ae->rr==true) strcpy(rr,"true");
-        else strcpy(rr,"false");
+    if(ae_object->rr != ae->rr){
+        if(ae_object->rr == false || ae_object->rr == 0 || ae_object->rr == FALSE) strcpy(rr,"false");
+        else strcpy(rr,"true");
     }
-
     if(ae_object->ty!=0) ae->ty=ae_object->ty;
    
     dbp = DB_CREATE_(dbp);

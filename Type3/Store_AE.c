@@ -21,7 +21,7 @@ int main() {
     ae1.lt = "20220513T083900";
     ae1.et = "20240513T083900";
     ae1.api = "tinyProject1";
-    ae1.rr = true;
+    ae1.rr = false;
     ae1.aei = "TAE1";
 
     ae2.rn = "Sensor2";

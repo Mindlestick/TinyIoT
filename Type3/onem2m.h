@@ -4,6 +4,9 @@
 #define DB_STR_MAX 500
 #define DB_SEP ";"
 
+#define FALSE 0
+#define TRUE 1
+
 typedef enum {
 	o_CREATE = 1,
 	o_RETRIEVE,
