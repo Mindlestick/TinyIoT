@@ -1106,7 +1106,7 @@ int DB_Update_AE(AE* ae_object) {
     if(ae_object->api!=NULL) strcpy(ae->api,ae_object->api);
     if(ae_object->aei!=NULL) strcpy(ae->aei,ae_object->aei);
     if(ae_object->rr != ae->rr){
-        if(ae_object->rr == false || ae_object->rr == 0 || ae_object->rr == FALSE) strcpy(rr,"false");
+        if(ae_object->rr == false || ae_object->rr == 0) strcpy(rr,"false");
         else strcpy(rr,"true");
     }
     if(ae_object->ty!=0) ae->ty=ae_object->ty;
