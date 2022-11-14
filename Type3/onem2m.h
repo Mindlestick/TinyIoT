@@ -58,17 +58,16 @@ typedef struct {
 } CNT;
 
 typedef struct {
-	char* et;
-	char* ct;
-	char* lt;
-	char* rn;
-	char* ri;
-	char* pi;
-	char* csi;
-	char* con;
-	int ty;
-	int st;
-	int cs;
+   char *et;
+   char *ct;
+   char *lt;
+   char *rn;
+   char *ri;
+   char *pi;
+   char *con;   
+   int ty;
+   int st;
+   int cs;
 } CIN;
 
 

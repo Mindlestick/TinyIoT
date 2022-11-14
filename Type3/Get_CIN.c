@@ -7,7 +7,7 @@
 
 int main() {
     CIN *cin = DB_Get_CIN("4-20220808T113154");
-    printf("%s\n",cin->csi);
+    printf("%s\n",cin->rn);
 
     return 0;
 }
@@ -138,21 +138,13 @@ CIN* DB_Get_CIN(char* ri) {
                     idx++;
                     break;       
                 case 7:
-                if(strcmp(ptr," ")==0) new_cin->csi=NULL; //data is NULL
-                    else{
-                    new_cin->csi = calloc(strlen(ptr),sizeof(char));
-                    strcpy(new_cin->csi, ptr);
-                    }
-                    idx++;
-                    break;   
-                case 8:
                 if(strcmp(ptr,"0")==0) new_cin->cs=0;
                     else
                     new_cin->cs = atoi(ptr);
 
                     idx++;
                     break;            
-                case 9:
+                case 8:
                 if(strcmp(ptr,"0")==0) new_cin->st=0;
                     else
                     new_cin->st = atoi(ptr);

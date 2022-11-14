@@ -321,7 +321,6 @@ int DB_Store_CIN(CIN *cin_object) {
     if (cin_object->et == NULL) cin_object->et = " ";
 
     if (cin_object->con == NULL) cin_object->con = " ";
-    if (cin_object->csi == NULL) cin_object->csi = " ";
     if (cin_object->cs == '\0') cin_object->cs = 0;
     if (cin_object->st == '\0') cin_object->st = 0;
 
@@ -339,9 +338,9 @@ int DB_Store_CIN(CIN *cin_object) {
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%d;%d",
+    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%d;%d",
             cin_object->rn,cin_object->pi,cin_object->ty,cin_object->ct,cin_object->lt,cin_object->et,
-            cin_object->con,cin_object->csi,cin_object->cs,cin_object->st);
+            cin_object->con,cin_object->cs,cin_object->st);
 
     data.data = str;
     data.size = strlen(str) + 1;
@@ -356,6 +355,7 @@ int DB_Store_CIN(CIN *cin_object) {
 
     return 1;
 }
+
 
 int DB_Store_ACP(ACP *acp_object) {
     char* DATABASE = "ACP.db";
@@ -887,21 +887,13 @@ CIN* DB_Get_CIN(char* ri) {
                     idx++;
                     break;       
                 case 7:
-                if(strcmp(ptr," ")==0) new_cin->csi=NULL; //data is NULL
-                    else{
-                    new_cin->csi = calloc(strlen(ptr),sizeof(char));
-                    strcpy(new_cin->csi, ptr);
-                    }
-                    idx++;
-                    break;   
-                case 8:
                 if(strcmp(ptr,"0")==0) new_cin->cs=0;
                     else
                     new_cin->cs = atoi(ptr);
 
                     idx++;
                     break;            
-                case 9:
+                case 8:
                 if(strcmp(ptr,"0")==0) new_cin->st=0;
                     else
                     new_cin->st = atoi(ptr);
@@ -919,7 +911,7 @@ CIN* DB_Get_CIN(char* ri) {
     if (ret != DB_NOTFOUND) {
         dbp->err(dbp, ret, "DBcursor->get");
         fprintf(stderr, "Cursor ERROR\n");
-        return NULL;
+        exit(0);
     }
     if (cin == 0 || flag==0) {
         fprintf(stderr, "Data not exist\n");

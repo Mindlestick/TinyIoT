@@ -23,7 +23,7 @@ int main() {
     cin1.et = "20220513T093154";
     cin1.cs = 2;
     cin1.con = "ON";
-    cin1.csi = "test1";
+    
 
     cin2.pi = "3-10220513091700249586";
     cin2.ri = "4-20220808T113154";
@@ -35,7 +35,7 @@ int main() {
     cin2.et = "20220808T113154";
     cin2.cs = 2;
     cin2.con = "OFF";
-    cin2.csi = "test2";
+    
 
     // [success -> 1] 
     if(DB_Store_CIN(&cin1)) fprintf(stderr, "store success!\n");
@@ -108,7 +108,6 @@ int DB_Store_CIN(CIN *cin_object) {
     if (cin_object->et == NULL) cin_object->et = " ";
 
     if (cin_object->con == NULL) cin_object->con = " ";
-    if (cin_object->csi == NULL) cin_object->csi = " ";
     if (cin_object->cs == '\0') cin_object->cs = 0;
     if (cin_object->st == '\0') cin_object->st = 0;
 
@@ -126,9 +125,9 @@ int DB_Store_CIN(CIN *cin_object) {
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%d;%d",
+    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%d;%d",
             cin_object->rn,cin_object->pi,cin_object->ty,cin_object->ct,cin_object->lt,cin_object->et,
-            cin_object->con,cin_object->csi,cin_object->cs,cin_object->st);
+            cin_object->con,cin_object->cs,cin_object->st);
 
     data.data = str;
     data.size = strlen(str) + 1;
