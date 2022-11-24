@@ -32,7 +32,7 @@ int main() {
     ae2.lt = "20220513T083900";
     ae2.et = "20240513T083900";
     ae2.api = "tinyProject2";
-    ae2.rr = true;
+    ae2.rr = 1;
     ae2.aei = "TAE2";
 
     ae3.rn = "Sensor3";
@@ -108,7 +108,7 @@ int DB_Store_AE(AE *ae_object) {
     // if input == NULL
     if (ae_object->ri == NULL) {
         fprintf(stderr, "ri is NULL\n");
-        return 0;
+        return -1;
     }
     if (ae_object->rn == NULL) ae_object->rn = " ";
     if (ae_object->pi == NULL) ae_object->pi = " ";
@@ -117,7 +117,7 @@ int DB_Store_AE(AE *ae_object) {
     if (ae_object->lt == NULL) ae_object->lt = " ";
     if (ae_object->et == NULL) ae_object->et = " ";
 
-    if(ae_object->rr == false) strcpy(rr,"false");
+    if(ae_object->rr == false || ae_object->rr == 0) strcpy(rr,"false");
     else strcpy(rr,"true");
 
     if (ae_object->api == NULL) ae_object->api = " ";

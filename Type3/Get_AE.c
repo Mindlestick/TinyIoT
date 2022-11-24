@@ -6,9 +6,9 @@
 #include "onem2m.h"
 
 int main() {
-    AE *ae = DB_Get_AE("TAE1");
+    AE *ae = DB_Get_AE("2-20211210093452845");
     if(ae->aei!=NULL)
-        printf("%s\n",ae->aei);
+        printf("%d\n",ae->rr);
     else printf("NULL\n");
 
     return 0;

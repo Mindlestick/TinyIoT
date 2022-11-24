@@ -6,14 +6,50 @@
 #include "onem2m.h"
 
 int main() {
+    Sub sub1;
+    Sub sub2;
+    Sub sub3;
 
-    ACP acp_after;
-    acp_after.rn = "acp_updateeee";
-    acp_after.ri = "1-20191210093452845";
+    sub1.rn = "sub1";
+    sub1.ri = "23-2022040684653299304";
+    sub1.pi = "3-20220406084023203796";
+    sub1.nu = "http://223.131.176.101:3000/ct=json";
+    sub1.net = "1";
+    sub1.ct = "20220406T084653";
+    sub1.et = "20220406T084653";
+    sub1.lt = "20220406T084653";
+    sub1.ty = 23;
+    sub1.nct = 1;
+    sub1.sur = "t";
 
-    int flag = DB_Update_ACP(&acp_after);
-    if(flag==1)
-        DB_display("ACP.db");
+    sub2.rn = "sub2";
+    sub2.ri = "23-2021040684653299304";
+    sub2.pi = "3-20220406084023203796";
+    sub2.nu = "http://223.131.176.101:3000/ct=json";
+    sub2.net = "2";
+    sub2.ct = "20210406T084653";
+    sub2.et = "20210406T084653";
+    sub2.lt = "20210406T084653";
+    sub2.ty = 23;
+    sub2.nct = 1;
+    sub2.sur = "tt";
+
+    sub3.rn = "sub3";
+    sub3.ri = "23-2023040684653299304";
+    sub3.pi = "3-20220406084023203796";
+    sub3.nu = "http://223.131.176.101:3000/ct=json";
+    sub3.net = "15";
+    sub3.ct = "20210406T084653";
+    sub3.et = "20210406T084653";
+    sub3.lt = "20210406T084653";
+    sub3.ty = 23;
+    sub3.nct = 1;
+    sub3.sur = "ttt";
+
+    DB_Store_Sub(&sub1);
+    DB_Store_Sub(&sub2);
+    DB_Store_Sub(&sub3);        
+    DB_display("Sub.db");
 
     return 0;
 }
@@ -43,7 +79,6 @@ DB* DB_OPEN_(DB *dbp,char* DATABASE){
     }
     return dbp;
 }
-
 /*DB Get Cursor*/
 DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     int ret;
@@ -56,35 +91,35 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-int DB_Update_ACP(ACP* acp_object) {
-    char* DATABASE = "ACP.db";    
-    DB* dbp;
-    DBC* dbcp;
-    DBT key_ri, data;
-    int ret;
 
-    /* ri NULL ERROR*/
-    if(acp_object->ri==NULL){
-        fprintf(stderr,"ri NULL ERROR\n");
+int DB_Store_Sub(Sub *sub_object) {
+    char* DATABASE = "Sub.db";
+
+    DB* dbp;    // db handle
+    DBC* dbcp;
+    int ret;        // template value
+    DBT key_ri;
+    DBT data;  // storving key and real data
+
+    // if input == NULL
+    if (sub_object->ri == NULL){
+        fprintf(stderr, "The ri is NULL\n");
         return -1;
     }
-
-    //Struct to store in DB
-    ACP* acp = calloc(1,sizeof(ACP));
-    acp = DB_Get_ACP(acp_object->ri);
-
-    if(acp_object->rn!=NULL) strcpy(acp->rn,acp_object->rn);
-    if(acp_object->pi!=NULL) strcpy(acp->pi,acp_object->pi);
-    if(acp_object->ct!=NULL) strcpy(acp->ct,acp_object->ct);
-    if(acp_object->lt!=NULL) strcpy(acp->lt,acp_object->lt);
-    if(acp_object->et!=NULL) strcpy(acp->et,acp_object->et);
-    if(acp_object->pv_acor!=NULL) strcpy(acp->pv_acor,acp_object->pv_acor);
-    if(acp_object->pv_acop!=NULL) strcpy(acp->pv_acop,acp_object->pv_acop);
-    if(acp_object->pvs_acor!=NULL) strcpy(acp->pvs_acor,acp_object->pvs_acor);       
-    if(acp_object->pvs_acop!=NULL) strcpy(acp->pvs_acop,acp_object->pvs_acop);    
-    if(acp_object->ty!=0) acp->ty=acp_object->ty;
-   
-
+    if (sub_object->rn == NULL) sub_object->rn = "";
+    if (sub_object->pi == NULL) {
+        fprintf(stderr, "The pi is NULL\n");
+        return -1;
+    }
+    if (sub_object->nu == NULL) sub_object->nu = "";
+    if (sub_object->net == NULL) sub_object->net = "1";
+    
+    if (sub_object->ct == NULL) sub_object->ct = "";
+    if (sub_object->et == NULL) sub_object->et = "";
+    if (sub_object->lt == NULL) sub_object->lt = "";
+    if (sub_object->ty == '\0') sub_object->ty = 23;
+    if (sub_object->nct == '\0') sub_object->nct = 1;
+    if (sub_object->sur == NULL) sub_object->sur = ""; 
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp,DATABASE);
@@ -95,18 +130,19 @@ int DB_Update_ACP(ACP* acp_object) {
     memset(&data, 0, sizeof(DBT));
 
     /* initialize the data to be the first of two duplicate records. */
-    key_ri.data = acp_object->ri;
-    key_ri.size = strlen(acp_object->ri) + 1;
+    key_ri.data = sub_object->ri;
+    key_ri.size = strlen(sub_object->ri) + 1;
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s;%s;%d;%s;%s;%s;%s;%s;%s",
-            acp->rn,acp->pi,acp->ty,acp->ct,acp->lt,
-            acp->et,acp->pv_acor,acp->pv_acop,acp->pvs_acor,acp->pvs_acop);
+    sprintf(str, "%s;%s;%s;%s;%d;%s;%s;%s;%d;%s",
+            sub_object->rn,sub_object->pi,sub_object->nu,sub_object->net,
+            sub_object->ty,sub_object->ct,sub_object->lt,sub_object->et,
+            sub_object->nct,sub_object->sur);
 
     data.data = str;
     data.size = strlen(str) + 1;
-    
+
     /* input DB */
     if ((ret = dbcp->put(dbcp, &key_ri, &data, DB_KEYLAST)) != 0)
         dbp->err(dbp, ret, "db->cursor");
@@ -161,16 +197,15 @@ int DB_display(char* database)
 
     /* Walk through the database and print out the key/data pairs. */
     while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
-        //int
         if (strncmp(key.data, "ty", key.size) == 0 ||
             strncmp(key.data, "st", key.size) == 0 ||
             strncmp(key.data, "cni", key.size) == 0 ||
             strncmp(key.data, "cbs", key.size) == 0 ||
-            strncmp(key.data, "cs", key.size) == 0
+            strncmp(key.data, "cs", key.size) == 0 ||
+            strncmp(key.data, "nct", key.size) == 0
             ) {
             printf("%.*s : %d\n", (int)key.size, (char*)key.data, *(int*)data.data);
         }
-        //bool
         else if (strncmp(key.data, "rr", key.size) == 0) {
             printf("%.*s : ", (int)key.size, (char*)key.data);
             if (*(bool*)data.data == true)
@@ -178,8 +213,6 @@ int DB_display(char* database)
             else
                 printf("false\n");
         }
-
-        //string
         else {
             printf("%.*s : %.*s\n",
                 (int)key.size, (char*)key.data,

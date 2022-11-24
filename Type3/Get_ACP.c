@@ -18,7 +18,7 @@ int main() {
     printf("프로그램 수행 시간 :%lf\n", (end-start));
 
     */
-    ACP *acp = Get_ACP("1-20191210093452845");
+    ACP *acp = DB_Get_ACP("1-20191210093452845");
     printf("%s\n",acp->rn);
 
     return 0;

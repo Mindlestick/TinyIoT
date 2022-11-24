@@ -176,11 +176,6 @@ CIN* DB_Get_CIN(char* ri);
 Sub* DB_Get_Sub(char* ri);
 ACP* DB_Get_ACP(char* ri);
 
-int DB_Update_AE(AE* ae_object);
-int DB_Update_CNT(CNT* cnt_object);
-int DB_Update_Sub(Sub *sub_object);
-int DB_Update_ACP(ACP *acp_object);
-
 int DB_Delete(char* ri);
 int DB_Delete_SUB(char* ri);
 int DB_Delete_ACP(char* ri);
