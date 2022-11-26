@@ -1,9 +1,6 @@
 doctrees/
 .buildinfo
 
-SOURCEDIR     = .
-BUILDDIR      = .
-
 # Ignore all
 *
 
