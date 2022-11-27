@@ -10,7 +10,6 @@ Download Berkeley DB
 
 `libdb`_ or `db-18.1.32.tar.gz`_
 
-
 If you downloaded the ``db-18.1.32.tar.gz`` file, unzip it.
 
 .. code-block:: bash
