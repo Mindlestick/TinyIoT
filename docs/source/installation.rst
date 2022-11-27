@@ -5,8 +5,17 @@ Installation environment  we used : ``Ubuntu 22.04 LTS`` , ``WSL2``
 
 The BerkeleyDB version we used : ``db-18.1.32``
 
-Download Berkeley DB `libdb`_,
-------------------------------
+Download Berkeley DB `libdb`_ or Download `db-18.1.32.tar.gz`_
+--------------------------------------------------------------
+
+
+If you downloaded the tar file
+
+.. code-block:: bash
+
+    tar xvfz db-18.1.32.tar.gz
+
+
 
 .. code-block:: bash
 
@@ -62,3 +71,6 @@ If you run the above code and still get an error
 
 .. _libdb:
     https://github.com/berkeleydb/libdb
+
+.. _db-18.1.32.tar.gz:
+    https://github.com/Mindlestick/TinyIoT/blob/main/db-18.1.32.tar.gz
