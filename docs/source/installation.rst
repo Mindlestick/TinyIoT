@@ -9,13 +9,14 @@ Download Berkeley DB `libdb`_ or Download `db-18.1.32.tar.gz`_
 --------------------------------------------------------------
 
 
-If you downloaded the tar file
+If you downloaded the ``db-18.1.32.tar.gz`` file, unzip it.
 
 .. code-block:: bash
 
     tar xvfz db-18.1.32.tar.gz
 
 
+Go to ``build_unix`` directory.
 
 .. code-block:: bash
 
@@ -73,4 +74,4 @@ If you run the above code and still get an error
     https://github.com/berkeleydb/libdb
 
 .. _db-18.1.32.tar.gz:
-    https://github.com/Mindlestick/TinyIoT/blob/main/db-18.1.32.tar.gz
+    https://github.com/Mindlestick/TinyIoT/raw/main/db-18.1.32.tar.gz
