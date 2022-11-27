@@ -5,8 +5,10 @@ Installation environment  we used : ``Ubuntu 22.04 LTS`` , ``WSL2``
 
 The BerkeleyDB version we used : ``db-18.1.32``
 
-Download Berkeley DB `libdb`_ or Download `db-18.1.32.tar.gz`_
---------------------------------------------------------------
+Download Berkeley DB
+--------------------
+
+`libdb`_ or `db-18.1.32.tar.gz`_
 
 
 If you downloaded the ``db-18.1.32.tar.gz`` file, unzip it.
