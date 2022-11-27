@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to TinyIoT_DB’s documentation! &mdash; TinyIoT_DB 1.0 문서</title>
+  <title>About The TinyIoT &mdash; TinyIoT_DB 1.0 문서</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="_static/favicon.ico"/>
@@ -20,10 +20,11 @@
         <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/translations.js"></script>
     <script src="_static/js/theme.js"></script>
-    <link rel="author" title="이 문서 정보" href="about.html" />
+    <link rel="author" title="이 문서 정보" href="#" />
     <link rel="index" title="색인" href="genindex.html" />
     <link rel="search" title="검색" href="search.html" />
-    <link rel="next" title="About The TinyIoT" href="about.html" /> 
+    <link rel="next" title="Function" href="function.html" />
+    <link rel="prev" title="Welcome to TinyIoT_DB’s documentation!" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -31,7 +32,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="#" class="icon icon-home"> TinyIoT_DB
+            <a href="index.html" class="icon icon-home"> TinyIoT_DB
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -42,8 +43,12 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">About the Project</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="about.html">About The TinyIoT</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">About The TinyIoT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-structure">Data Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resource-browser">Resource Browser</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="function.html">Function</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
@@ -58,17 +63,17 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">TinyIoT_DB</a>
+          <a href="index.html">TinyIoT_DB</a>
       </nav>
 
       <div class="wy-nav-content">
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home"></a></li>
-      <li class="breadcrumb-item active">Welcome to TinyIoT_DB’s documentation!</li>
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">About The TinyIoT</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/about.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -76,44 +81,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-tinyiot-db-s-documentation">
-<h1>Welcome to TinyIoT_DB’s documentation!<a class="headerlink" href="#welcome-to-tinyiot-db-s-documentation" title="이 제목에 대한 퍼머링크"></a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">About the Project</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="about.html">About The TinyIoT</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="about.html#data-structure">Data Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="about.html#resource-browser">Resource Browser</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="function.html">Function</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="function.html#crud">CRUD 함수 종류</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html#id1">그 외 함수 종류</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html#type3">Type3 (현재 서버 적용중인 구조)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html#type1">Type1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html#edit-etc-profile">Edit etc/profile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="function.html#error-db-h-no-such-file-or-directory">Error “db.h: No such file or directory”</a></li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="toctree-wrapper compound">
-</div>
+  <section id="about-the-tinyiot">
+<h1>About The TinyIoT<a class="headerlink" href="#about-the-tinyiot" title="이 제목에 대한 퍼머링크"></a></h1>
+<p>In the case of the existing IoT platform, it was difficult to operate dynamically because it was made up of Java and various functions were included. We developed an tiny IoT platform for device support in C language in accordance with the oneM2M international standard, implemented it to operate efficiently, and displayed the result in the developed <a class="reference external" href="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/7d96873f-1fd2-46d5-af7e-317923e4b813/KakaoTalk_20221106_190008224.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&amp;X-Amz-Credential=AKIAT73L2G45EIPT3X45%2F20221127%2Fus-west-2%2Fs3%2Faws4_request&amp;X-Amz-Date=20221127T125611Z&amp;X-Amz-Expires=86400&amp;X-Amz-Signature=7ff8a8409307d9c16732b49cba4ed7334c569d1adc2fa9c405343796bf415a35&amp;X-Amz-SignedHeaders=host&amp;response-content-disposition=filename%3D%22KakaoTalk_20221106_190008224.mp4%22&amp;x-id=GetObject">resource browser</a>.</p>
+<p>Language : <code class="docutils literal notranslate"><span class="pre">C</span></code></p>
+<p>Resources : <code class="docutils literal notranslate"><span class="pre">ACP(1)</span></code>, <code class="docutils literal notranslate"><span class="pre">AE(2)</span></code>, <code class="docutils literal notranslate"><span class="pre">CNT(3)</span></code>, <code class="docutils literal notranslate"><span class="pre">CIN(4)</span></code>, <code class="docutils literal notranslate"><span class="pre">SUB(23)</span></code></p>
+<section id="data-structure">
+<h2>Data Structure<a class="headerlink" href="#data-structure" title="이 제목에 대한 퍼머링크"></a></h2>
+<img alt="_images/data_structure.png" src="_images/data_structure.png" />
 </section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="이 제목에 대한 퍼머링크"></a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">색인</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">모듈 목록</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">검색 페이지</span></a></p></li>
-</ul>
+<section id="resource-browser">
+<h2>Resource Browser<a class="headerlink" href="#resource-browser" title="이 제목에 대한 퍼머링크"></a></h2>
+<p>수정중</p>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="about.html" class="btn btn-neutral float-right" title="About The TinyIoT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to TinyIoT_DB’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="function.html" class="btn btn-neutral float-right" title="Function" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

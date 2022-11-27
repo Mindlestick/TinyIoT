@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; TinyIoT_DB 1.0 문서</title>
+  <title>Function &mdash; TinyIoT_DB 1.0 문서</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="shortcut icon" href="_static/favicon.ico"/>
@@ -23,8 +23,8 @@
     <link rel="author" title="이 문서 정보" href="about.html" />
     <link rel="index" title="색인" href="genindex.html" />
     <link rel="search" title="검색" href="search.html" />
-    <link rel="next" title="Usage" href="usage.html" />
-    <link rel="prev" title="Function" href="function.html" /> 
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="About The TinyIoT" href="about.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,18 +43,21 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">About the Project</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="about.html">About The Project</a></li>
-<li class="toctree-l1"><a class="reference internal" href="function.html">Function</a></li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#download-berkeley-db">Download Berkeley DB</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About The TinyIoT</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Function</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#crud">CRUD 함수 종류</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">그 외 함수 종류</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#type3">Type3 (현재 서버 적용중인 구조)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#type1">Type1</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#edit-etc-profile">Edit etc/profile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#error-db-h-no-such-file-or-directory">Error “db.h: No such file or directory”</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 </ul>
 
@@ -72,9 +75,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home"></a></li>
-      <li class="breadcrumb-item active">Installation</li>
+      <li class="breadcrumb-item active">Function</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/function.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -82,12 +85,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="이 제목에 대한 퍼머링크"></a></h1>
-<p>Installation environment  we used : <code class="docutils literal notranslate"><span class="pre">Ubuntu</span> <span class="pre">22.04</span> <span class="pre">LTS</span></code> , <code class="docutils literal notranslate"><span class="pre">WSL2</span></code></p>
-<p>The BerkeleyDB version we used : <code class="docutils literal notranslate"><span class="pre">db-18.1.32</span></code></p>
-<section id="download-berkeley-db">
-<h2>Download Berkeley DB<a class="headerlink" href="#download-berkeley-db" title="이 제목에 대한 퍼머링크"></a></h2>
+  <section id="function">
+<h1>Function<a class="headerlink" href="#function" title="이 제목에 대한 퍼머링크"></a></h1>
+<section id="crud">
+<h2>CRUD 함수 종류<a class="headerlink" href="#crud" title="이 제목에 대한 퍼머링크"></a></h2>
+<img alt="_images/func1.png" src="_images/func1.png" />
+</section>
+<section id="id1">
+<h2>그 외 함수 종류<a class="headerlink" href="#id1" title="이 제목에 대한 퍼머링크"></a></h2>
+<img alt="_images/func2.png" src="_images/func2.png" />
+</section>
+<section id="type3">
+<h2>Type3 (현재 서버 적용중인 구조)<a class="headerlink" href="#type3" title="이 제목에 대한 퍼머링크"></a></h2>
+</section>
+<section id="type1">
+<h2>Type1<a class="headerlink" href="#type1" title="이 제목에 대한 퍼머링크"></a></h2>
 <p><a class="reference external" href="https://github.com/berkeleydb/libdb">libdb</a> or <a class="reference external" href="https://github.com/Mindlestick/TinyIoT/raw/main/db-18.1.32.tar.gz">db-18.1.32.tar.gz</a></p>
 <p>If you downloaded the <code class="docutils literal notranslate"><span class="pre">db-18.1.32.tar.gz</span></code> file, unzip it.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tar xvfz db-18.1.32.tar.gz
@@ -141,8 +153,8 @@ sudo apt-get install ia32-libs g++-multilib
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="function.html" class="btn btn-neutral float-left" title="Function" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="usage.html" class="btn btn-neutral float-right" title="Usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="about.html" class="btn btn-neutral float-left" title="About The TinyIoT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

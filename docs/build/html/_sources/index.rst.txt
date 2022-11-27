@@ -9,6 +9,13 @@ Welcome to TinyIoT_DB's documentation!
 
 .. toctree::
     :maxdepth: 2
+    :caption: About the Project
+
+    about
+    function
+
+.. toctree::
+    :maxdepth: 2
     :caption: Getting started
     :hidden:
 
