@@ -8,11 +8,10 @@
 #define DB_SEP ";"
 
 int main() {
-    AE *ae = DB_Get_AE("2-20211210093452845");
-    if(ae->aei!=NULL)
-        printf("%d\n",ae->rr);
+    Sub *sub = DB_Get_Sub("23-2021040684653299304");
+    if(sub->rn!=NULL)
+        printf("%s\n",sub->rn);
     else printf("NULL\n");
-
     return 0;
 }
 
@@ -24,7 +23,7 @@ DB* DB_CREATE_(DB *dbp){
     if (ret) {
         fprintf(stderr, "db_create : %s\n", db_strerror(ret));
         fprintf(stderr, "File ERROR\n");
-        exit(0);
+        return NULL;
     }
     return dbp;
 }
@@ -41,6 +40,7 @@ DB* DB_OPEN_(DB *dbp,char* DATABASE){
     }
     return dbp;
 }
+
 /*DB Get Cursor*/
 DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     int ret;
@@ -48,16 +48,16 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     if ((ret = dbp->cursor(dbp, NULL, &dbcp, 0)) != 0) {
         dbp->err(dbp, ret, "DB->cursor");
         fprintf(stderr, "Cursor ERROR");
-        exit(0);
+        return NULL;
     }
     return dbcp;
 }
 
-AE* DB_Get_AE(char* ri) {
-    char* DATABASE = "RESOURCE.db";
+Sub* DB_Get_Sub(char* ri) {
+    char* DATABASE = "Sub.db";
 
     //struct to return
-    AE* new_ae = calloc(1,sizeof(AE));
+    Sub* new_sub = calloc(1,sizeof(Sub));
 
     DB* dbp;
     DBC* dbcp;
@@ -81,87 +81,85 @@ AE* DB_Get_AE(char* ri) {
         if (strncmp(key.data, ri, key.size) == 0) {
             flag=1;
             // ri = key
-            new_ae->ri = calloc(key.size,sizeof(char));
-            strcpy(new_ae->ri, key.data);
+            new_sub->ri = calloc(key.size,sizeof(char));
+            strcpy(new_sub->ri, key.data);
 
             char *ptr = strtok((char*)data.data,DB_SEP);  //split first string
             while (ptr != NULL) { // Split to end of next string
                 switch (idx) {
                 case 0:
-                if(strcmp(ptr," ")==0) new_ae->rn=NULL; //data is NULL
+                if(strncmp(ptr," ",1)==0) new_sub->rn=NULL; //data is NULL
                 else{
-                    new_ae->rn = calloc(strlen(ptr),sizeof(char));
-                    strcpy(new_ae->rn, ptr);
+                    new_sub->rn = calloc(strlen(ptr),sizeof(char));
+                    strcpy(new_sub->rn, ptr);
                 }
                     idx++;
                     break;
                 case 1:
-                if(strcmp(ptr," ")==0) new_ae->pi=NULL; //data is NULL
+                if(strncmp(ptr," ",1)==0) new_sub->pi=NULL; //data is NULL
                     else{
-                    new_ae->pi = calloc(strlen(ptr),sizeof(char));
-                    strcpy(new_ae->pi, ptr);
+                    new_sub->pi = calloc(strlen(ptr),sizeof(char));
+                    strcpy(new_sub->pi, ptr);
                     }
                     idx++;
                     break;
                 case 2:
-                if(strcmp(ptr,"0")==0) new_ae->ty=0;
-                else new_ae->ty = atoi(ptr);
+                if(strncmp(ptr," ",1)==0) new_sub->nu=NULL; //data is NULL
+                else{
+                    new_sub->nu = calloc(strlen(ptr),sizeof(char));
+                    strcpy(new_sub->nu, ptr);
+                }
+                    idx++;
+                    break;  
+                case 3:
+                if(strncmp(ptr," ",1)==0) new_sub->net=NULL; //data is NULL
+                else{
+                    new_sub->net = calloc(strlen(ptr),sizeof(char));
+                    strcpy(new_sub->net, ptr);
+                }
+                    idx++;
+                    break;                                      
+                case 5:
+                if(strncmp(ptr,"0",1)==0) new_sub->ty=0;
+                else new_sub->ty = atoi(ptr);
 
                     idx++;
                     break;
-                case 3:
-                if(strcmp(ptr," ")==0) new_ae->ct=NULL; //data is NULL
+                case 6:
+                if(strncmp(ptr," ",1)==0) new_sub->ct=NULL; //data is NULL
                 else{
-                    new_ae->ct = calloc(strlen(ptr),sizeof(char));
-                    strcpy(new_ae->ct, ptr);
+                    new_sub->ct = calloc(strlen(ptr),sizeof(char));
+                    strcpy(new_sub->ct, ptr);
                 }
                     idx++;
                     break;
-                case 4:
-                if(strcmp(ptr," ")==0) new_ae->lt=NULL; //data is NULL
+                case 7:
+                if(strncmp(ptr," ",1)==0) new_sub->lt=NULL; //data is NULL
                 else{                
-                    new_ae->lt = calloc(strlen(ptr),sizeof(char));
-                    strcpy(new_ae->lt, ptr);
+                    new_sub->lt = calloc(strlen(ptr),sizeof(char));
+                    strcpy(new_sub->lt, ptr);
                 }
                     idx++;
                     break;                
-                case 5:
-                if(strcmp(ptr," ")==0) new_ae->et=NULL; //data is NULL
+                case 8:
+                if(strncmp(ptr," ",1)==0) new_sub->et=NULL; //data is NULL
                 else{                
-                    new_ae->et = calloc(strlen(ptr),sizeof(char));
-                    strcpy(new_ae->et, ptr);
+                    new_sub->et = calloc(strlen(ptr),sizeof(char));
+                    strcpy(new_sub->et, ptr);
                 }
                     idx++;
-                    break;      
-                case 6:
-                if(strcmp(ptr," ")==0) new_ae->api=NULL; //data is NULL
-                else{                
-                    new_ae->api = calloc(strlen(ptr),sizeof(char));
-                    strcpy(new_ae->api, ptr);
-                }
-                    idx++;
-                    break;      
-                case 7:
-                    if(strcmp(ptr,"true")==0)
-                        new_ae->rr = true;
-                    else
-                        new_ae->rr = false;
+                    break;
+                case 9:
+                if(strncmp(ptr,"0",1)==0) new_sub->nct=0;
+                else new_sub->nct = atoi(ptr);
 
                     idx++;
-                    break;      
-                case 8:
-                if(strcmp(ptr," ")==0) new_ae->aei=NULL; //data is NULL
-                else{                
-                    new_ae->aei = calloc(strlen(ptr),sizeof(char));
-                    strcpy(new_ae->aei, ptr);
-                }
-                    idx++;
-                    break;                                                                     
+                    break;                                                                                                 
                 default:
                     idx=-1;
                 }
                 
-                ptr = strtok(NULL, DB_SEP); //The delimiter is ,
+                ptr = strtok(NULL, DB_SEP); //The delimiter is ;
             }
         }
     }
@@ -181,5 +179,5 @@ AE* DB_Get_AE(char* ri) {
     if (dbp != NULL)
         dbp->close(dbp, 0);
 
-    return new_ae;
+    return new_sub;
 }

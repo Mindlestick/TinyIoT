@@ -4,6 +4,8 @@
 #include <string.h>
 #include <db.h>
 #include "onem2m.h"
+#define DB_STR_MAX 2048
+#define DB_SEP ";"
 
 int main() {
     Sub sub1;
@@ -20,7 +22,6 @@ int main() {
     sub1.lt = "20220406T084653";
     sub1.ty = 23;
     sub1.nct = 1;
-    sub1.sur = "t";
 
     sub2.rn = "sub2";
     sub2.ri = "23-2021040684653299304";
@@ -32,7 +33,6 @@ int main() {
     sub2.lt = "20210406T084653";
     sub2.ty = 23;
     sub2.nct = 1;
-    sub2.sur = "tt";
 
     sub3.rn = "sub3";
     sub3.ri = "23-2023040684653299304";
@@ -44,7 +44,6 @@ int main() {
     sub3.lt = "20210406T084653";
     sub3.ty = 23;
     sub3.nct = 1;
-    sub3.sur = "ttt";
 
     DB_Store_Sub(&sub1);
     DB_Store_Sub(&sub2);
@@ -119,7 +118,6 @@ int DB_Store_Sub(Sub *sub_object) {
     if (sub_object->lt == NULL) sub_object->lt = "";
     if (sub_object->ty == '\0') sub_object->ty = 23;
     if (sub_object->nct == '\0') sub_object->nct = 1;
-    if (sub_object->sur == NULL) sub_object->sur = ""; 
 
     dbp = DB_CREATE_(dbp);
     dbp = DB_OPEN_(dbp,DATABASE);
@@ -135,10 +133,10 @@ int DB_Store_Sub(Sub *sub_object) {
 
     /* List data excluding 'ri' as strings using delimiters. */
     char str[DB_STR_MAX]= "\0";
-    sprintf(str, "%s;%s;%s;%s;%d;%s;%s;%s;%d;%s",
+    sprintf(str, "%s;%s;%s;%s;%d;%s;%s;%s;%d",
             sub_object->rn,sub_object->pi,sub_object->nu,sub_object->net,
             sub_object->ty,sub_object->ct,sub_object->lt,sub_object->et,
-            sub_object->nct,sub_object->sur);
+            sub_object->nct);
 
     data.data = str;
     data.size = strlen(str) + 1;

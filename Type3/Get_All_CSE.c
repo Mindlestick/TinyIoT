@@ -114,6 +114,9 @@ Node* DB_Get_All_CSE() {
     }
 
     node->siblingLeft->siblingRight = NULL;
+    free(node->ri);
+    free(node->rn);
+    free(node->pi);
     free(node);
     node = NULL;
 

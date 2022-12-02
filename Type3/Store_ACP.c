@@ -6,6 +6,8 @@
 #include <ctype.h>
 #include <time.h>
 #include "onem2m.h"
+#define DB_STR_MAX 2048
+#define DB_SEP ";"
 
 /* Function to create test data */
 ACP* StructGenerator(){

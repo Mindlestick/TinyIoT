@@ -33,7 +33,8 @@
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
-                " -ldb"
+                " -ldb",
+                " -lm"
             ],
             "options": {
                 "cwd": "${fileDirname}"

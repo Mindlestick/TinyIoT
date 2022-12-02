@@ -5,12 +5,24 @@
 #include <db.h>
 #include "onem2m.h"
 
+int net_to_bit(char *net){
+    int netLen = strlen(net);
+    int ret=0;
+
+    for(int i=0;i<netLen;i++){
+        int exp = atoi(net+1);
+        if(exp > 0) ret = (ret | (int)pow(2, exp - 1));
+    }
+    
+    return ret;
+}
+
 int main() {
 
-    Node* cnt = DB_Get_All_CNT();
-    while (cnt) {
-        //fprintf(stderr, "%s\n", cnt->rn);
-        //cnt = cnt->siblingRight;
+    Node* sub = DB_Get_All_Sub();
+    while (sub) {
+        fprintf(stderr, "%s\n", sub->rn);
+        sub = sub->siblingRight;
     }
 
     return 0;
@@ -54,9 +66,10 @@ DBC* DB_GET_CURSOR(DB *dbp, DBC *dbcp){
     return dbcp;
 }
 
-Node* DB_Get_All_CNT() {
-    char* DATABASE = "RESOURCE.db";
-    char* TYPE = "3-";
+Node* DB_Get_All_Sub() {
+    fprintf(stderr,"\x1b[92m[Get All Sub]\x1b[0m\n");    
+    char* DATABASE = "Sub.db";
+    char* TYPE = "23-";
 
     DB* dbp;
     DBC* dbcp;
@@ -71,40 +84,43 @@ Node* DB_Get_All_CNT() {
     memset(&key, 0, sizeof(key));
     memset(&data, 0, sizeof(data));
 
-    int cnt = 0;
+    int sub = 0;
     DBC* dbcp0;
     dbcp0 = DB_GET_CURSOR(dbp,dbcp0);
     while ((ret = dbcp0->get(dbcp0, &key, &data, DB_NEXT)) == 0) {
-        if (strncmp(key.data, TYPE , 2) == 0) 
-            cnt++;
+        if (strncmp(key.data, TYPE , 3) == 0) 
+            sub++;
     }
-    //fprintf(stderr, "<%d>\n",cnt);
+    //fprintf(stderr, "<%d>\n",sub);
 
-    if (cnt == 0) {
+    if (sub == 0) {
         fprintf(stderr, "Data not exist\n");
         return NULL;
     }
 
-    Node* head = calloc(cnt,sizeof(Node));
+    Node* head = calloc(sub,sizeof(Node));
     Node* node;
     node = head;
 
     while ((ret = dbcp->get(dbcp, &key, &data, DB_NEXT)) == 0) {
-        if (strncmp(key.data, TYPE , 2) == 0){
-            CNT* CNT = DB_Get_CNT((char*)key.data);
-            node->ri = calloc(strlen(CNT->ri)+1,sizeof(char));
-            node->rn = calloc(strlen(CNT->rn)+1,sizeof(char));
-            node->pi = calloc(strlen(CNT->pi)+1,sizeof(char));
+        if (strncmp(key.data, TYPE , 3) == 0){
+            Sub* sub = DB_Get_Sub((char*)key.data);
+            node->ri = calloc(strlen(sub->ri)+1,sizeof(char));
+            node->rn = calloc(strlen(sub->rn)+1,sizeof(char));
+            node->pi = calloc(strlen(sub->pi)+1,sizeof(char));
+            node->nu = calloc(strlen(sub->nu)+1,sizeof(char));
 
-            strcpy(node->ri,CNT->ri);
-            strcpy(node->rn,CNT->rn);
-            strcpy(node->pi,CNT->pi);
-            node->ty = CNT->ty;
+            strcpy(node->ri,sub->ri);
+            strcpy(node->rn,sub->rn);
+            strcpy(node->pi,sub->pi);
+            strcpy(node->rn,sub->nu);    
+            node->ty = sub->ty;
+            node->net = net_to_bit(sub->net);            
 
             node->siblingRight=calloc(1,sizeof(Node));            
             node->siblingRight->siblingLeft = node;
             node = node->siblingRight;
-            free(CNT);
+            free(sub);
         }
     }
     if (ret != DB_NOTFOUND) {
@@ -117,6 +133,7 @@ Node* DB_Get_All_CNT() {
     free(node->ri);
     free(node->rn);
     free(node->pi);
+    free(node->nu);     
     free(node);
     node = NULL;
 

@@ -4,6 +4,8 @@
 #include <string.h>
 #include <db.h>
 #include "onem2m.h"
+#define DB_STR_MAX 2048
+#define DB_SEP ";"
 
 int main() {
     CSE *cse = DB_Get_CSE("5-20191210093452845");

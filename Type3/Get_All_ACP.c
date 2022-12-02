@@ -114,9 +114,12 @@ Node* DB_Get_All_ACP() {
     }
 
     node->siblingLeft->siblingRight = NULL;
+    free(node->ri);
+    free(node->rn);
+    free(node->pi);
     free(node);
     node = NULL;
-
+    
     /* Cursors must be closed */
     if (dbcp != NULL)
         dbcp->close(dbcp);
