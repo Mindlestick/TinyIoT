@@ -49,9 +49,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#crud">CRUD 함수 종류</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#id1">그 외 함수 종류</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#type3">Type3 (현재 서버 적용중인 구조)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#type1">Type1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#edit-etc-profile">Edit etc/profile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#error-db-h-no-such-file-or-directory">Error “db.h: No such file or directory”</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#type1-x">Type1 (현재 사용X)</a></li>
 </ul>
 </li>
 </ul>
@@ -98,54 +96,8 @@
 <section id="type3">
 <h2>Type3 (현재 서버 적용중인 구조)<a class="headerlink" href="#type3" title="이 제목에 대한 퍼머링크"></a></h2>
 </section>
-<section id="type1">
-<h2>Type1<a class="headerlink" href="#type1" title="이 제목에 대한 퍼머링크"></a></h2>
-<p><a class="reference external" href="https://github.com/berkeleydb/libdb">libdb</a> or <a class="reference external" href="https://github.com/Mindlestick/TinyIoT/raw/main/db-18.1.32.tar.gz">db-18.1.32.tar.gz</a></p>
-<p>If you downloaded the <code class="docutils literal notranslate"><span class="pre">db-18.1.32.tar.gz</span></code> file, unzip it.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>tar xvfz db-18.1.32.tar.gz
-</pre></div>
-</div>
-<p>Go to <code class="docutils literal notranslate"><span class="pre">build_unix</span></code> directory.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> db-18.1.32
-<span class="nb">cd</span> build_unix
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>../dist/configure <span class="se">\</span>
---enable-dbm <span class="se">\</span>
---enable-sql <span class="se">\</span>
---enable-o_direct <span class="se">\</span>
---enable-localization <span class="se">\</span>
---enable-umrw <span class="se">\</span>
---enable-cxx <span class="se">\</span>
---enable-atomicfileread <span class="se">\</span>
---enable-sql_compat <span class="se">\</span>
-<span class="nv">CFLAGS</span><span class="o">=</span><span class="s2">&quot;-I/usr/local/ssl/include -L/usr/local/ssl/lib -DSQLITE_DIRECT_OVERFLOW_READ -DSQLITE_ENABLE_DBSTAT_VTAB -DSQLITE_ENABLE_DBPAGE_VTAB -DSQLITE_ENABLE_RTREE -DSQLITE_USE_ALLOCA -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_ENABLE_RBU&quot;</span>
-</pre></div>
-</div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make
-sudo make install
-</pre></div>
-</div>
-</section>
-<section id="edit-etc-profile">
-<h2>Edit etc/profile<a class="headerlink" href="#edit-etc-profile" title="이 제목에 대한 퍼머링크"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>/usr/local/BerkeleyDB.18.1/lib:<span class="nv">$LD_LIBRARY_PATH</span>
-<span class="nb">export</span> LD_LIBRARY_PATH
-</pre></div>
-</div>
-</section>
-<section id="error-db-h-no-such-file-or-directory">
-<h2>Error “db.h: No such file or directory”<a class="headerlink" href="#error-db-h-no-such-file-or-directory" title="이 제목에 대한 퍼머링크"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install libdb-dev
-sudo apt-get install libdb4o-cil-dev
-</pre></div>
-</div>
-<p>If you run the above code and still get an error</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install libdb4-dev
-sudo apt-get install libc6-i386 lib32gcc1
-sudo apt-get install ia32-libs g++-multilib
-</pre></div>
-</div>
+<section id="type1-x">
+<h2>Type1 (현재 사용X)<a class="headerlink" href="#type1-x" title="이 제목에 대한 퍼머링크"></a></h2>
 </section>
 </section>
 
